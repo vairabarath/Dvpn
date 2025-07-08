@@ -2,8 +2,6 @@ syntax = "proto3";
 
 package dvpn;
 
-option go_package = "github.com/vairabarath/Dvpn/base/pb";
-
 service BaseNodeService {
     rpc RegisterSuperNode (RegisterRequest) returns (RegisterResponse);
     rpc SuperNodeHeartbeat (HeartbeatRequest) returns (Ack);

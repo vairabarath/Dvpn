@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package dvpn;
+
+service SuperNodeService {
+    rpc RegisterClientPeer (PeerRegistrationRequest) returns (RegisterResponse);
+    rpc PeerSessionHeartbeat (PeerSessionHeartbeatRequest) returns (Ack);
+}
+
+message PeerRegistrationRequest {
+    string peer_id = 1;
+    string public_key = 2;
+    string version = 3;
+    string os = 4;
+    string region = 5;
+    string nat_type = 6;
+}
+
+message PeerSessionHeartbeatRequest {
+    string peer_id = 1;
+    string exit_peer_id = 2;
+    int32 latency_ms = 3;
+    float packet_loss = 4;
+    float throughput_mbps = 5;
+    int32 session_uptime_secs = 6;
+}
+
+message RegisterResponse {
+    bool success = 1;
+    string message = 2;
+    string assigned_id = 3;
+    string registered_at = 4;
+}
+
+message Ack {
+    bool received = 1;
+    string message = 2;
+}

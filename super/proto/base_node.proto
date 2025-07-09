@@ -10,13 +10,15 @@ service BaseNodeService {
 }
 
 message RegisterRequest {
-    string node_id = 1;
-    string region = 2;
-    string ip = 3;
-    string public_key = 4;
-    int32 max_peers = 5;
-    string version = 6;
-    string startup_time = 7;
+    string node_id = 1;           
+    string region = 2;            
+    string ip = 3;               
+    string public_key = 4;        
+    string signature = 5;         
+    string nonce = 6;            
+    int32 max_peers = 7;          
+    string version = 8;           
+    string startup_time = 9;      
 }
 
 message RegisterResponse {

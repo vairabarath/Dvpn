@@ -1,8 +1,11 @@
 package client
 
 import (
+	super "Super_node/crypto"
 	"Super_node/pb"
 	"context"
+	"encoding/base64"
+	"fmt"
 	"log"
 	"time"
 
@@ -15,6 +18,7 @@ type SuperNode struct {
 	id string
 }
 
+
 func NewSupreNode(conn *grpc.ClientConn, id string) *SuperNode {
 	return &SuperNode{
 		client: pb.NewBaseNodeServiceClient(conn),
@@ -26,11 +30,23 @@ func (s *SuperNode) Register() error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 
+	priv, pub, err := super.LoadOrCreateKeypair()
+	if err != nil {
+		log.Fatalf("❌ Failed to load/create keypair: %v", err)
+	}
+
+	nonce := super.GenerateNonce()
+	fmt.Println(nonce)
+	sign := super.SignPayload(priv, s.id, "IN", "127.0.0.1", nonce)
+
+
 	req := &pb.RegisterRequest{
 		NodeId: s.id,
 		Region: "IN",
 		Ip: "127.0.0.1",
-		PublicKey: "dsfgakjhdcbaykgfakhjsg",
+		PublicKey: base64.StdEncoding.EncodeToString(pub),
+		Signature: sign,
+		Nonce: nonce,
 		MaxPeers: 100,
 		Version: "0.1",
 		StartupTime: time.Now().Format(time.RFC3339),
@@ -41,8 +57,13 @@ func (s *SuperNode) Register() error {
 		return err
 	}
 
-	log.Printf("Registered with base node: %s", res.Message)
-	return nil
+	if !res.Success {
+	log.Printf("❌ Registration rejected by base node: %s", res.Message)
+	return fmt.Errorf("registration failed: %s", res.Message)
+}
+
+log.Printf("✅ Registered with base node: %s", res.Message)
+return nil
 }
 
 func (s *SuperNode) StartHeartbeat() {

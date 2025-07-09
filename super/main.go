@@ -4,6 +4,8 @@ import (
 	"Super_node/client"
 	"Super_node/pb"
 	"Super_node/server"
+	"flag"
+	"fmt"
 	"log"
 	"net"
 
@@ -13,7 +15,11 @@ import (
 func main() {
 	// Step 1: Start gRPC server for Client Peers
 	go func() {
-		lis, err := net.Listen("tcp", ":50052")
+		peerPort := flag.String("peer-port", ":50052", "Port for Super Node Server")
+		flag.Parse()
+		addr := fmt.Sprintf(":%s", *peerPort)
+
+		lis, err := net.Listen("tcp", addr)
 		if err != nil {
 			log.Fatalf("Failed to listen: %v", err)
 		}

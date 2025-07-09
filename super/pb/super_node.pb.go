@@ -252,7 +252,7 @@ func file_proto_super_node_proto_init() {
 	if File_proto_super_node_proto != nil {
 		return
 	}
-	file_proto_base_node_proto_init()
+	file_base_node_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

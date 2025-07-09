@@ -29,6 +29,8 @@ type PeerRegistrationRequest struct {
 	Os            string                 `protobuf:"bytes,4,opt,name=os,proto3" json:"os,omitempty"`
 	Region        string                 `protobuf:"bytes,5,opt,name=region,proto3" json:"region,omitempty"`
 	NatType       string                 `protobuf:"bytes,6,opt,name=nat_type,json=natType,proto3" json:"nat_type,omitempty"`
+	Signature     string                 `protobuf:"bytes,7,opt,name=signature,proto3" json:"signature,omitempty"`
+	Nonce         string                 `protobuf:"bytes,8,opt,name=nonce,proto3" json:"nonce,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -101,6 +103,20 @@ func (x *PeerRegistrationRequest) GetRegion() string {
 func (x *PeerRegistrationRequest) GetNatType() string {
 	if x != nil {
 		return x.NatType
+	}
+	return ""
+}
+
+func (x *PeerRegistrationRequest) GetSignature() string {
+	if x != nil {
+		return x.Signature
+	}
+	return ""
+}
+
+func (x *PeerRegistrationRequest) GetNonce() string {
+	if x != nil {
+		return x.Nonce
 	}
 	return ""
 }
@@ -193,7 +209,7 @@ var File_super_node_proto protoreflect.FileDescriptor
 
 const file_super_node_proto_rawDesc = "" +
 	"\n" +
-	"\x10super_node.proto\x12\x04dvpn\x1a\x0fbase_node.proto\"\xae\x01\n" +
+	"\x10super_node.proto\x12\x04dvpn\x1a\x0fbase_node.proto\"\xe2\x01\n" +
 	"\x17PeerRegistrationRequest\x12\x17\n" +
 	"\apeer_id\x18\x01 \x01(\tR\x06peerId\x12\x1d\n" +
 	"\n" +
@@ -201,7 +217,9 @@ const file_super_node_proto_rawDesc = "" +
 	"\aversion\x18\x03 \x01(\tR\aversion\x12\x0e\n" +
 	"\x02os\x18\x04 \x01(\tR\x02os\x12\x16\n" +
 	"\x06region\x18\x05 \x01(\tR\x06region\x12\x19\n" +
-	"\bnat_type\x18\x06 \x01(\tR\anatType\"\xf1\x01\n" +
+	"\bnat_type\x18\x06 \x01(\tR\anatType\x12\x1c\n" +
+	"\tsignature\x18\a \x01(\tR\tsignature\x12\x14\n" +
+	"\x05nonce\x18\b \x01(\tR\x05nonce\"\xf1\x01\n" +
 	"\x1bPeerSessionHeartbeatRequest\x12\x17\n" +
 	"\apeer_id\x18\x01 \x01(\tR\x06peerId\x12 \n" +
 	"\fexit_peer_id\x18\x02 \x01(\tR\n" +

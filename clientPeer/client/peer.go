@@ -1,8 +1,11 @@
 package client
 
 import (
+	"Client_peer/crypto"
 	"Client_peer/pb"
 	"context"
+	"encoding/base64"
+	"fmt"
 	"log"
 	"time"
 
@@ -11,33 +14,42 @@ import (
 
 type ClientPeer struct {
 	client pb.SuperNodeServiceClient
-	id string
+	id     string
 }
-
 
 func NewClientPeer(conn *grpc.ClientConn, id string) *ClientPeer {
 	return &ClientPeer{
 		client: pb.NewSuperNodeServiceClient(conn),
-		id: id,
+		id:     id,
 	}
 }
 
 func (cp *ClientPeer) Register() error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
-	defer cancel()	
+	defer cancel()
+
+	priv, pub, _ := crypto.LoadOrCreateKeypair()
+	nonce := crypto.GenerateNonce()
+	signature := crypto.SignPeerPayload(priv, cp.id, "IN", "Linux", "symmetric", nonce)
 
 	req := &pb.PeerRegistrationRequest{
-		PeerId: cp.id,
-		PublicKey: "dfkakjhrwjbfkyqgf",
-		Version: "0.1",
-		Os: "Linux",
-		Region: "IN",
-		NatType: "symmetric",
+		PeerId:    cp.id,
+		PublicKey: base64.StdEncoding.EncodeToString(pub),
+		Version:   "0.1",
+		Os:        "Linux",
+		Region:    "IN",
+		NatType:   "symmetric",
+		Signature: signature,
+		Nonce:     nonce,
 	}
 
 	res, err := cp.client.RegisterClientPeer(ctx, req)
 	if err != nil {
 		return err
+	}
+
+	if !res.Success {
+		return fmt.Errorf("registration failed: %s", res.Message)
 	}
 
 	log.Printf("✅ Registered to Super Node: %s | ID: %s", res.Message, res.AssignedId)
@@ -50,18 +62,18 @@ func (cp *ClientPeer) StartHeartbeat() {
 
 	for range ticker.C {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
-		defer cancel()
 
 		req := &pb.PeerSessionHeartbeatRequest{
-			PeerId: cp.id,
-			ExitPeerId: "1535748",
-			LatencyMs: 57,
-			PacketLoss: 0.2,
-			ThroughputMbps: 12.3,
+			PeerId:            cp.id,
+			ExitPeerId:        "1535748",
+			LatencyMs:         57,
+			PacketLoss:        0.2,
+			ThroughputMbps:    12.3,
 			SessionUptimeSecs: 300,
 		}
 
 		res, err := cp.client.PeerSessionHeartbeat(ctx, req)
+		cancel()
 		if err != nil {
 			log.Printf("Heartbeat failed: %v", err)
 			continue

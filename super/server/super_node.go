@@ -7,7 +7,6 @@ import (
 	"time"
 )
 
-
 type SuperNodeServer struct {
 	pb.UnimplementedSuperNodeServiceServer
 	registeredPeers map[string]*pb.PeerRegistrationRequest
@@ -20,14 +19,30 @@ func NewSupreNodeServer() *SuperNodeServer {
 }
 
 func (s *SuperNodeServer) RegisterClientPeer(ctx context.Context, req *pb.PeerRegistrationRequest) (*pb.RegisterResponse, error) {
+	if !verifyClientPeer(
+		req.PeerId,
+		req.Region,
+		req.Os,
+		req.NatType,
+		req.Nonce,
+		req.PublicKey,
+		req.Signature,
+	) {
+		log.Printf("❌ Signature verification failed for peer %s", req.PeerId)
+		return &pb.RegisterResponse{
+			Success: false,
+			Message: "Invalid signature",
+		}, nil
+	}
+
 	s.registeredPeers[req.PeerId] = req
 
 	log.Printf("👤 Registered Peer: %s [%s] OS: %s NAT: %s", req.PeerId, req.Region, req.Os, req.NatType)
 
 	return &pb.RegisterResponse{
-		Success: true,
-		Message: "Client peer registered successfully",
-		AssignedId: req.PeerId,
+		Success:      true,
+		Message:      "Client peer registered successfully",
+		AssignedId:   req.PeerId,
 		RegisteredAt: time.Now().Format(time.RFC3339),
 	}, nil
 }
@@ -38,6 +53,6 @@ func (s *SuperNodeServer) PeerSessionHeartbeat(ctx context.Context, req *pb.Peer
 
 	return &pb.Ack{
 		Received: true,
-		Message: "Heartbeat received",
+		Message:  "Heartbeat received",
 	}, nil
 }

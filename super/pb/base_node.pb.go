@@ -9,6 +9,7 @@ package pb
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -23,15 +24,16 @@ const (
 
 type RegisterRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	NodeId        string                 `protobuf:"bytes,1,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`                // Unique ID for the Super Node
-	Region        string                 `protobuf:"bytes,2,opt,name=region,proto3" json:"region,omitempty"`                              // Region where node operates
-	Ip            string                 `protobuf:"bytes,3,opt,name=ip,proto3" json:"ip,omitempty"`                                      // Reachable public IP
-	PublicKey     string                 `protobuf:"bytes,4,opt,name=public_key,json=publicKey,proto3" json:"public_key,omitempty"`       // Base64(Ed25519 public key)
-	Signature     string                 `protobuf:"bytes,5,opt,name=signature,proto3" json:"signature,omitempty"`                        // Base64(Ed25519 signature of ID+region+ip+nonce)
-	Nonce         string                 `protobuf:"bytes,6,opt,name=nonce,proto3" json:"nonce,omitempty"`                                // Base64 random nonce
-	MaxPeers      int32                  `protobuf:"varint,7,opt,name=max_peers,json=maxPeers,proto3" json:"max_peers,omitempty"`         // Config limit
-	Version       string                 `protobuf:"bytes,8,opt,name=version,proto3" json:"version,omitempty"`                            // Software version
-	StartupTime   string                 `protobuf:"bytes,9,opt,name=startup_time,json=startupTime,proto3" json:"startup_time,omitempty"` // ISO 8601 timestamp
+	NodeId        string                 `protobuf:"bytes,1,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
+	Region        string                 `protobuf:"bytes,2,opt,name=region,proto3" json:"region,omitempty"`
+	Ip            string                 `protobuf:"bytes,3,opt,name=ip,proto3" json:"ip,omitempty"`
+	PublicKey     string                 `protobuf:"bytes,4,opt,name=public_key,json=publicKey,proto3" json:"public_key,omitempty"`
+	Signature     string                 `protobuf:"bytes,5,opt,name=signature,proto3" json:"signature,omitempty"`
+	Nonce         string                 `protobuf:"bytes,6,opt,name=nonce,proto3" json:"nonce,omitempty"`
+	MaxPeers      int32                  `protobuf:"varint,7,opt,name=max_peers,json=maxPeers,proto3" json:"max_peers,omitempty"`
+	Version       string                 `protobuf:"bytes,8,opt,name=version,proto3" json:"version,omitempty"`
+	StartupTime   string                 `protobuf:"bytes,9,opt,name=startup_time,json=startupTime,proto3" json:"startup_time,omitempty"`
+	Port          string                 `protobuf:"bytes,10,opt,name=port,proto3" json:"port,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -125,6 +127,13 @@ func (x *RegisterRequest) GetVersion() string {
 func (x *RegisterRequest) GetStartupTime() string {
 	if x != nil {
 		return x.StartupTime
+	}
+	return ""
+}
+
+func (x *RegisterRequest) GetPort() string {
+	if x != nil {
+		return x.Port
 	}
 	return ""
 }
@@ -333,11 +342,147 @@ func (x *Ack) GetMessage() string {
 	return ""
 }
 
+type SuperNode struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	NodeId          string                 `protobuf:"bytes,1,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
+	Region          string                 `protobuf:"bytes,2,opt,name=region,proto3" json:"region,omitempty"`
+	Ip              string                 `protobuf:"bytes,3,opt,name=ip,proto3" json:"ip,omitempty"`
+	Version         string                 `protobuf:"bytes,4,opt,name=version,proto3" json:"version,omitempty"`
+	LatestHeartbeat string                 `protobuf:"bytes,5,opt,name=latest_heartbeat,json=latestHeartbeat,proto3" json:"latest_heartbeat,omitempty"`
+	IsAlive         bool                   `protobuf:"varint,6,opt,name=is_alive,json=isAlive,proto3" json:"is_alive,omitempty"`
+	Port            string                 `protobuf:"bytes,7,opt,name=port,proto3" json:"port,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *SuperNode) Reset() {
+	*x = SuperNode{}
+	mi := &file_base_node_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SuperNode) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SuperNode) ProtoMessage() {}
+
+func (x *SuperNode) ProtoReflect() protoreflect.Message {
+	mi := &file_base_node_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SuperNode.ProtoReflect.Descriptor instead.
+func (*SuperNode) Descriptor() ([]byte, []int) {
+	return file_base_node_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *SuperNode) GetNodeId() string {
+	if x != nil {
+		return x.NodeId
+	}
+	return ""
+}
+
+func (x *SuperNode) GetRegion() string {
+	if x != nil {
+		return x.Region
+	}
+	return ""
+}
+
+func (x *SuperNode) GetIp() string {
+	if x != nil {
+		return x.Ip
+	}
+	return ""
+}
+
+func (x *SuperNode) GetVersion() string {
+	if x != nil {
+		return x.Version
+	}
+	return ""
+}
+
+func (x *SuperNode) GetLatestHeartbeat() string {
+	if x != nil {
+		return x.LatestHeartbeat
+	}
+	return ""
+}
+
+func (x *SuperNode) GetIsAlive() bool {
+	if x != nil {
+		return x.IsAlive
+	}
+	return false
+}
+
+func (x *SuperNode) GetPort() string {
+	if x != nil {
+		return x.Port
+	}
+	return ""
+}
+
+type SuperNodeList struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Nodes         []*SuperNode           `protobuf:"bytes,1,rep,name=nodes,proto3" json:"nodes,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SuperNodeList) Reset() {
+	*x = SuperNodeList{}
+	mi := &file_base_node_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SuperNodeList) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SuperNodeList) ProtoMessage() {}
+
+func (x *SuperNodeList) ProtoReflect() protoreflect.Message {
+	mi := &file_base_node_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SuperNodeList.ProtoReflect.Descriptor instead.
+func (*SuperNodeList) Descriptor() ([]byte, []int) {
+	return file_base_node_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *SuperNodeList) GetNodes() []*SuperNode {
+	if x != nil {
+		return x.Nodes
+	}
+	return nil
+}
+
 var File_base_node_proto protoreflect.FileDescriptor
 
 const file_base_node_proto_rawDesc = "" +
 	"\n" +
-	"\x0fbase_node.proto\x12\x04dvpn\"\xff\x01\n" +
+	"\x0fbase_node.proto\x12\x04dvpn\x1a\x1bgoogle/protobuf/empty.proto\"\x93\x02\n" +
 	"\x0fRegisterRequest\x12\x17\n" +
 	"\anode_id\x18\x01 \x01(\tR\x06nodeId\x12\x16\n" +
 	"\x06region\x18\x02 \x01(\tR\x06region\x12\x0e\n" +
@@ -348,7 +493,9 @@ const file_base_node_proto_rawDesc = "" +
 	"\x05nonce\x18\x06 \x01(\tR\x05nonce\x12\x1b\n" +
 	"\tmax_peers\x18\a \x01(\x05R\bmaxPeers\x12\x18\n" +
 	"\aversion\x18\b \x01(\tR\aversion\x12!\n" +
-	"\fstartup_time\x18\t \x01(\tR\vstartupTime\"\x8c\x01\n" +
+	"\fstartup_time\x18\t \x01(\tR\vstartupTime\x12\x12\n" +
+	"\x04port\x18\n" +
+	" \x01(\tR\x04port\"\x8c\x01\n" +
 	"\x10RegisterResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12\x1f\n" +
@@ -364,10 +511,21 @@ const file_base_node_proto_rawDesc = "" +
 	"\ttimestamp\x18\x06 \x01(\tR\ttimestamp\";\n" +
 	"\x03Ack\x12\x1a\n" +
 	"\breceived\x18\x01 \x01(\bR\breceived\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage2\x8e\x01\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"\xc0\x01\n" +
+	"\tSuperNode\x12\x17\n" +
+	"\anode_id\x18\x01 \x01(\tR\x06nodeId\x12\x16\n" +
+	"\x06region\x18\x02 \x01(\tR\x06region\x12\x0e\n" +
+	"\x02ip\x18\x03 \x01(\tR\x02ip\x12\x18\n" +
+	"\aversion\x18\x04 \x01(\tR\aversion\x12)\n" +
+	"\x10latest_heartbeat\x18\x05 \x01(\tR\x0flatestHeartbeat\x12\x19\n" +
+	"\bis_alive\x18\x06 \x01(\bR\aisAlive\x12\x12\n" +
+	"\x04port\x18\a \x01(\tR\x04port\"6\n" +
+	"\rSuperNodeList\x12%\n" +
+	"\x05nodes\x18\x01 \x03(\v2\x0f.dvpn.SuperNodeR\x05nodes2\xd2\x01\n" +
 	"\x0fBaseNodeService\x12B\n" +
 	"\x11RegisterSuperNode\x12\x15.dvpn.RegisterRequest\x1a\x16.dvpn.RegisterResponse\x127\n" +
-	"\x12SuperNodeHeartbeat\x12\x16.dvpn.HeartbeatRequest\x1a\t.dvpn.AckB&Z$github.com/vairabarath/Dvpn/super/pbb\x06proto3"
+	"\x12SuperNodeHeartbeat\x12\x16.dvpn.HeartbeatRequest\x1a\t.dvpn.Ack\x12B\n" +
+	"\x13GetActiveSuperNodes\x12\x16.google.protobuf.Empty\x1a\x13.dvpn.SuperNodeListB&Z$github.com/vairabarath/Dvpn/super/pbb\x06proto3"
 
 var (
 	file_base_node_proto_rawDescOnce sync.Once
@@ -381,23 +539,29 @@ func file_base_node_proto_rawDescGZIP() []byte {
 	return file_base_node_proto_rawDescData
 }
 
-var file_base_node_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_base_node_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_base_node_proto_goTypes = []any{
 	(*RegisterRequest)(nil),  // 0: dvpn.RegisterRequest
 	(*RegisterResponse)(nil), // 1: dvpn.RegisterResponse
 	(*HeartbeatRequest)(nil), // 2: dvpn.HeartbeatRequest
 	(*Ack)(nil),              // 3: dvpn.Ack
+	(*SuperNode)(nil),        // 4: dvpn.SuperNode
+	(*SuperNodeList)(nil),    // 5: dvpn.SuperNodeList
+	(*emptypb.Empty)(nil),    // 6: google.protobuf.Empty
 }
 var file_base_node_proto_depIdxs = []int32{
-	0, // 0: dvpn.BaseNodeService.RegisterSuperNode:input_type -> dvpn.RegisterRequest
-	2, // 1: dvpn.BaseNodeService.SuperNodeHeartbeat:input_type -> dvpn.HeartbeatRequest
-	1, // 2: dvpn.BaseNodeService.RegisterSuperNode:output_type -> dvpn.RegisterResponse
-	3, // 3: dvpn.BaseNodeService.SuperNodeHeartbeat:output_type -> dvpn.Ack
-	2, // [2:4] is the sub-list for method output_type
-	0, // [0:2] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	4, // 0: dvpn.SuperNodeList.nodes:type_name -> dvpn.SuperNode
+	0, // 1: dvpn.BaseNodeService.RegisterSuperNode:input_type -> dvpn.RegisterRequest
+	2, // 2: dvpn.BaseNodeService.SuperNodeHeartbeat:input_type -> dvpn.HeartbeatRequest
+	6, // 3: dvpn.BaseNodeService.GetActiveSuperNodes:input_type -> google.protobuf.Empty
+	1, // 4: dvpn.BaseNodeService.RegisterSuperNode:output_type -> dvpn.RegisterResponse
+	3, // 5: dvpn.BaseNodeService.SuperNodeHeartbeat:output_type -> dvpn.Ack
+	5, // 6: dvpn.BaseNodeService.GetActiveSuperNodes:output_type -> dvpn.SuperNodeList
+	4, // [4:7] is the sub-list for method output_type
+	1, // [1:4] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_base_node_proto_init() }
@@ -411,7 +575,7 @@ func file_base_node_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_base_node_proto_rawDesc), len(file_base_node_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   4,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -13,11 +13,13 @@ import (
 )
 
 func main() {
+
+	peerPort := flag.String("peer-port", ":50052", "Port for Super Node Server")
+	flag.Parse()
+	addr := fmt.Sprintf(":%s", *peerPort)
+	addrWithoutColon := *peerPort
 	// Step 1: Start gRPC server for Client Peers
 	go func() {
-		peerPort := flag.String("peer-port", ":50052", "Port for Super Node Server")
-		flag.Parse()
-		addr := fmt.Sprintf(":%s", *peerPort)
 
 		lis, err := net.Listen("tcp", addr)
 		if err != nil {
@@ -36,13 +38,14 @@ func main() {
 	}()
 
 	// Step 2: Connect to Base Node as a gRPC client
+
 	conn, err := grpc.Dial("localhost:50051", grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("❌ Failed to connect to base node: %v", err)
 	}
 	defer conn.Close()
 
-	node := client.NewSupreNode(conn, "super-IN-001")
+	node := client.NewSupreNode(conn, "super-IN-001", addrWithoutColon)
 
 	if err := node.Register(); err != nil {
 		log.Fatalf("❌ Registration failed: %v", err)

@@ -12,17 +12,17 @@ import (
 	"google.golang.org/grpc"
 )
 
-
 type SuperNode struct {
 	client pb.BaseNodeServiceClient
-	id string
+	id     string
+	port   string
 }
 
-
-func NewSupreNode(conn *grpc.ClientConn, id string) *SuperNode {
+func NewSupreNode(conn *grpc.ClientConn, id string, port string) *SuperNode {
 	return &SuperNode{
 		client: pb.NewBaseNodeServiceClient(conn),
-		id: id,
+		id:     id,
+		port:   port,
 	}
 }
 
@@ -39,31 +39,31 @@ func (s *SuperNode) Register() error {
 	fmt.Println(nonce)
 	sign := super.SignPayload(priv, s.id, "IN", "127.0.0.1", nonce)
 
-
 	req := &pb.RegisterRequest{
-		NodeId: s.id,
-		Region: "IN",
-		Ip: "127.0.0.1",
-		PublicKey: base64.StdEncoding.EncodeToString(pub),
-		Signature: sign,
-		Nonce: nonce,
-		MaxPeers: 100,
-		Version: "0.1",
+		NodeId:      s.id,
+		Region:      "IN",
+		Ip:          "127.0.0.1",
+		Port:        s.port,
+		PublicKey:   base64.StdEncoding.EncodeToString(pub),
+		Signature:   sign,
+		Nonce:       nonce,
+		MaxPeers:    100,
+		Version:     "0.1",
 		StartupTime: time.Now().Format(time.RFC3339),
 	}
 
 	res, err := s.client.RegisterSuperNode(ctx, req)
-	if err != nil{
+	if err != nil {
 		return err
 	}
 
 	if !res.Success {
-	log.Printf("❌ Registration rejected by base node: %s", res.Message)
-	return fmt.Errorf("registration failed: %s", res.Message)
-}
+		log.Printf("❌ Registration rejected by base node: %s", res.Message)
+		return fmt.Errorf("registration failed: %s", res.Message)
+	}
 
-log.Printf("✅ Registered with base node: %s", res.Message)
-return nil
+	log.Printf("✅ Registered with base node: %s", res.Message)
+	return nil
 }
 
 func (s *SuperNode) StartHeartbeat() {
@@ -75,12 +75,12 @@ func (s *SuperNode) StartHeartbeat() {
 		defer cancel()
 
 		req := &pb.HeartbeatRequest{
-			NodeId: s.id,
-			ActivePeers: 80,
-			AvgLatencyMs: 57,
+			NodeId:             s.id,
+			ActivePeers:        80,
+			AvgLatencyMs:       57,
 			ExitPeersAvailable: 10,
 			BandwidthUsageMbps: 72.6,
-			Timestamp: time.Now().Format(time.RFC3339),
+			Timestamp:          time.Now().Format(time.RFC3339),
 		}
 
 		res, err := s.client.SuperNodeHeartbeat(ctx, req)

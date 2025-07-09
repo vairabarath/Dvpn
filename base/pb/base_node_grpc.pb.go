@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v3.21.12
-// source: base_node.proto
+// source: proto/base_node.proto
 
 package pb
 
@@ -11,6 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -19,8 +20,9 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	BaseNodeService_RegisterSuperNode_FullMethodName  = "/dvpn.BaseNodeService/RegisterSuperNode"
-	BaseNodeService_SuperNodeHeartbeat_FullMethodName = "/dvpn.BaseNodeService/SuperNodeHeartbeat"
+	BaseNodeService_RegisterSuperNode_FullMethodName   = "/dvpn.BaseNodeService/RegisterSuperNode"
+	BaseNodeService_SuperNodeHeartbeat_FullMethodName  = "/dvpn.BaseNodeService/SuperNodeHeartbeat"
+	BaseNodeService_GetActiveSuperNodes_FullMethodName = "/dvpn.BaseNodeService/GetActiveSuperNodes"
 )
 
 // BaseNodeServiceClient is the client API for BaseNodeService service.
@@ -29,6 +31,7 @@ const (
 type BaseNodeServiceClient interface {
 	RegisterSuperNode(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
 	SuperNodeHeartbeat(ctx context.Context, in *HeartbeatRequest, opts ...grpc.CallOption) (*Ack, error)
+	GetActiveSuperNodes(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*SuperNodeList, error)
 }
 
 type baseNodeServiceClient struct {
@@ -59,12 +62,23 @@ func (c *baseNodeServiceClient) SuperNodeHeartbeat(ctx context.Context, in *Hear
 	return out, nil
 }
 
+func (c *baseNodeServiceClient) GetActiveSuperNodes(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*SuperNodeList, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SuperNodeList)
+	err := c.cc.Invoke(ctx, BaseNodeService_GetActiveSuperNodes_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // BaseNodeServiceServer is the server API for BaseNodeService service.
 // All implementations must embed UnimplementedBaseNodeServiceServer
 // for forward compatibility.
 type BaseNodeServiceServer interface {
 	RegisterSuperNode(context.Context, *RegisterRequest) (*RegisterResponse, error)
 	SuperNodeHeartbeat(context.Context, *HeartbeatRequest) (*Ack, error)
+	GetActiveSuperNodes(context.Context, *emptypb.Empty) (*SuperNodeList, error)
 	mustEmbedUnimplementedBaseNodeServiceServer()
 }
 
@@ -80,6 +94,9 @@ func (UnimplementedBaseNodeServiceServer) RegisterSuperNode(context.Context, *Re
 }
 func (UnimplementedBaseNodeServiceServer) SuperNodeHeartbeat(context.Context, *HeartbeatRequest) (*Ack, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SuperNodeHeartbeat not implemented")
+}
+func (UnimplementedBaseNodeServiceServer) GetActiveSuperNodes(context.Context, *emptypb.Empty) (*SuperNodeList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetActiveSuperNodes not implemented")
 }
 func (UnimplementedBaseNodeServiceServer) mustEmbedUnimplementedBaseNodeServiceServer() {}
 func (UnimplementedBaseNodeServiceServer) testEmbeddedByValue()                         {}
@@ -138,6 +155,24 @@ func _BaseNodeService_SuperNodeHeartbeat_Handler(srv interface{}, ctx context.Co
 	return interceptor(ctx, in, info, handler)
 }
 
+func _BaseNodeService_GetActiveSuperNodes_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BaseNodeServiceServer).GetActiveSuperNodes(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BaseNodeService_GetActiveSuperNodes_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BaseNodeServiceServer).GetActiveSuperNodes(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // BaseNodeService_ServiceDesc is the grpc.ServiceDesc for BaseNodeService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -153,7 +188,11 @@ var BaseNodeService_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "SuperNodeHeartbeat",
 			Handler:    _BaseNodeService_SuperNodeHeartbeat_Handler,
 		},
+		{
+			MethodName: "GetActiveSuperNodes",
+			Handler:    _BaseNodeService_GetActiveSuperNodes_Handler,
+		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "base_node.proto",
+	Metadata: "proto/base_node.proto",
 }

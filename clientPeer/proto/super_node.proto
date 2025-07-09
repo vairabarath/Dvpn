@@ -2,6 +2,10 @@ syntax = "proto3";
 
 package dvpn;
 
+import "base_node.proto";
+
+option go_package = "github.com/vairabarath/Dvpn/clientPeer/pb";
+
 service SuperNodeService {
     rpc RegisterClientPeer (PeerRegistrationRequest) returns (RegisterResponse);
     rpc PeerSessionHeartbeat (PeerSessionHeartbeatRequest) returns (Ack);
@@ -25,14 +29,3 @@ message PeerSessionHeartbeatRequest {
     int32 session_uptime_secs = 6;
 }
 
-message RegisterResponse {
-    bool success = 1;
-    string message = 2;
-    string assigned_id = 3;
-    string registered_at = 4;
-}
-
-message Ack {
-    bool received = 1;
-    string message = 2;
-}

@@ -6,6 +6,8 @@ import (
 	"time"
 
 	pb "Base_node/pb"
+
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type SuperNodeInfo struct {
@@ -18,6 +20,7 @@ type SuperNodeInfo struct {
 	StartupTime   string
 	RegisteredAt  string
 	LastHeartbeat time.Time
+	Port          string
 }
 
 type BaseNodeServer struct {
@@ -53,6 +56,7 @@ func (s *BaseNodeServer) RegisterSuperNode(ctx context.Context, req *pb.Register
 		StartupTime:   req.StartupTime,
 		RegisteredAt:  time.Now().Format(time.RFC3339),
 		LastHeartbeat: time.Now(),
+		Port:          req.Port,
 	}
 
 	log.Printf("👤 Registered Super Node: %s [%s] IP: %s", req.NodeId, req.Region, req.Ip)
@@ -106,4 +110,26 @@ func (s *BaseNodeServer) StartSuperNodeMonitoring() {
 			log.Println("End of super Node monitoring cycle")
 		}
 	}()
+}
+
+func (s *BaseNodeServer) GetActiveSuperNodes(ctx context.Context, _ *emptypb.Empty) (*pb.SuperNodeList, error) {
+	now := time.Now()
+	list := &pb.SuperNodeList{}
+
+	for _, node := range s.registeredSuperNodes {
+		isAlive := now.Sub(node.LastHeartbeat) <= 2*time.Minute
+
+		list.Nodes = append(list.Nodes, &pb.SuperNode{
+			NodeId:          node.NodeID,
+			Region:          node.Region,
+			Ip:              node.IP,
+			Version:         node.Version,
+			LatestHeartbeat: node.LastHeartbeat.Format(time.RFC3339),
+			IsAlive:         isAlive,
+			Port:            node.Port,
+		})
+	}
+
+	log.Printf("📡 Returned %d Super Nodes to client peer", len(list.Nodes))
+	return list, nil
 }

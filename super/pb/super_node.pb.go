@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.6
 // 	protoc        v3.21.12
-// source: proto/super_node.proto
+// source: super_node.proto
 
 package pb
 
@@ -35,7 +35,7 @@ type PeerRegistrationRequest struct {
 
 func (x *PeerRegistrationRequest) Reset() {
 	*x = PeerRegistrationRequest{}
-	mi := &file_proto_super_node_proto_msgTypes[0]
+	mi := &file_super_node_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -47,7 +47,7 @@ func (x *PeerRegistrationRequest) String() string {
 func (*PeerRegistrationRequest) ProtoMessage() {}
 
 func (x *PeerRegistrationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_super_node_proto_msgTypes[0]
+	mi := &file_super_node_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -60,7 +60,7 @@ func (x *PeerRegistrationRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PeerRegistrationRequest.ProtoReflect.Descriptor instead.
 func (*PeerRegistrationRequest) Descriptor() ([]byte, []int) {
-	return file_proto_super_node_proto_rawDescGZIP(), []int{0}
+	return file_super_node_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *PeerRegistrationRequest) GetPeerId() string {
@@ -119,7 +119,7 @@ type PeerSessionHeartbeatRequest struct {
 
 func (x *PeerSessionHeartbeatRequest) Reset() {
 	*x = PeerSessionHeartbeatRequest{}
-	mi := &file_proto_super_node_proto_msgTypes[1]
+	mi := &file_super_node_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -131,7 +131,7 @@ func (x *PeerSessionHeartbeatRequest) String() string {
 func (*PeerSessionHeartbeatRequest) ProtoMessage() {}
 
 func (x *PeerSessionHeartbeatRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_super_node_proto_msgTypes[1]
+	mi := &file_super_node_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -144,7 +144,7 @@ func (x *PeerSessionHeartbeatRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PeerSessionHeartbeatRequest.ProtoReflect.Descriptor instead.
 func (*PeerSessionHeartbeatRequest) Descriptor() ([]byte, []int) {
-	return file_proto_super_node_proto_rawDescGZIP(), []int{1}
+	return file_super_node_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *PeerSessionHeartbeatRequest) GetPeerId() string {
@@ -189,11 +189,11 @@ func (x *PeerSessionHeartbeatRequest) GetSessionUptimeSecs() int32 {
 	return 0
 }
 
-var File_proto_super_node_proto protoreflect.FileDescriptor
+var File_super_node_proto protoreflect.FileDescriptor
 
-const file_proto_super_node_proto_rawDesc = "" +
+const file_super_node_proto_rawDesc = "" +
 	"\n" +
-	"\x16proto/super_node.proto\x12\x04dvpn\x1a\x15proto/base_node.proto\"\xae\x01\n" +
+	"\x10super_node.proto\x12\x04dvpn\x1a\x0fbase_node.proto\"\xae\x01\n" +
 	"\x17PeerRegistrationRequest\x12\x17\n" +
 	"\apeer_id\x18\x01 \x01(\tR\x06peerId\x12\x1d\n" +
 	"\n" +
@@ -217,25 +217,25 @@ const file_proto_super_node_proto_rawDesc = "" +
 	"\x14PeerSessionHeartbeat\x12!.dvpn.PeerSessionHeartbeatRequest\x1a\t.dvpn.AckB&Z$github.com/vairabarath/Dvpn/super/pbb\x06proto3"
 
 var (
-	file_proto_super_node_proto_rawDescOnce sync.Once
-	file_proto_super_node_proto_rawDescData []byte
+	file_super_node_proto_rawDescOnce sync.Once
+	file_super_node_proto_rawDescData []byte
 )
 
-func file_proto_super_node_proto_rawDescGZIP() []byte {
-	file_proto_super_node_proto_rawDescOnce.Do(func() {
-		file_proto_super_node_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_proto_super_node_proto_rawDesc), len(file_proto_super_node_proto_rawDesc)))
+func file_super_node_proto_rawDescGZIP() []byte {
+	file_super_node_proto_rawDescOnce.Do(func() {
+		file_super_node_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_super_node_proto_rawDesc), len(file_super_node_proto_rawDesc)))
 	})
-	return file_proto_super_node_proto_rawDescData
+	return file_super_node_proto_rawDescData
 }
 
-var file_proto_super_node_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
-var file_proto_super_node_proto_goTypes = []any{
+var file_super_node_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_super_node_proto_goTypes = []any{
 	(*PeerRegistrationRequest)(nil),     // 0: dvpn.PeerRegistrationRequest
 	(*PeerSessionHeartbeatRequest)(nil), // 1: dvpn.PeerSessionHeartbeatRequest
 	(*RegisterResponse)(nil),            // 2: dvpn.RegisterResponse
 	(*Ack)(nil),                         // 3: dvpn.Ack
 }
-var file_proto_super_node_proto_depIdxs = []int32{
+var file_super_node_proto_depIdxs = []int32{
 	0, // 0: dvpn.SuperNodeService.RegisterClientPeer:input_type -> dvpn.PeerRegistrationRequest
 	1, // 1: dvpn.SuperNodeService.PeerSessionHeartbeat:input_type -> dvpn.PeerSessionHeartbeatRequest
 	2, // 2: dvpn.SuperNodeService.RegisterClientPeer:output_type -> dvpn.RegisterResponse
@@ -247,9 +247,9 @@ var file_proto_super_node_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for field type_name
 }
 
-func init() { file_proto_super_node_proto_init() }
-func file_proto_super_node_proto_init() {
-	if File_proto_super_node_proto != nil {
+func init() { file_super_node_proto_init() }
+func file_super_node_proto_init() {
+	if File_super_node_proto != nil {
 		return
 	}
 	file_base_node_proto_init()
@@ -257,17 +257,17 @@ func file_proto_super_node_proto_init() {
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_super_node_proto_rawDesc), len(file_proto_super_node_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_super_node_proto_rawDesc), len(file_super_node_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_proto_super_node_proto_goTypes,
-		DependencyIndexes: file_proto_super_node_proto_depIdxs,
-		MessageInfos:      file_proto_super_node_proto_msgTypes,
+		GoTypes:           file_super_node_proto_goTypes,
+		DependencyIndexes: file_super_node_proto_depIdxs,
+		MessageInfos:      file_super_node_proto_msgTypes,
 	}.Build()
-	File_proto_super_node_proto = out.File
-	file_proto_super_node_proto_goTypes = nil
-	file_proto_super_node_proto_depIdxs = nil
+	File_super_node_proto = out.File
+	file_super_node_proto_goTypes = nil
+	file_super_node_proto_depIdxs = nil
 }

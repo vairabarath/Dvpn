@@ -2,9 +2,11 @@ package server
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"time"
 
+	"Base_node/client"
 	pb "Base_node/pb"
 
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -14,22 +16,27 @@ type SuperNodeInfo struct {
 	NodeID        string
 	Region        string
 	IP            string
+	Port          string
 	PublicKey     string
 	Version       string
 	MaxPeers      int32
 	StartupTime   string
 	RegisteredAt  string
 	LastHeartbeat time.Time
-	Port          string
+	BandwidthMbps float32
+	AvgLatency    float32
+	ExitPeers     int32
 }
 
 type BaseNodeServer struct {
 	pb.UnimplementedBaseNodeServiceServer
+	localRegion          string
 	registeredSuperNodes map[string]*SuperNodeInfo
 }
 
-func NewBaseNodeServer() *BaseNodeServer {
+func NewBaseNodeServer(local string) *BaseNodeServer {
 	return &BaseNodeServer{
+		localRegion:          local,
 		registeredSuperNodes: make(map[string]*SuperNodeInfo),
 	}
 }
@@ -83,6 +90,8 @@ func (s *BaseNodeServer) SuperNodeHeartbeat(ctx context.Context, req *pb.Heartbe
 	}
 
 	node.LastHeartbeat = time.Now()
+	node.BandwidthMbps = req.BandwidthUsageMbps
+	node.AvgLatency = req.AvgLatencyMs
 	log.Printf("Heartbeat from %s | Last heartbeat: %s", req.NodeId, node.LastHeartbeat.Format(time.RFC3339))
 	return &pb.Ack{
 		Received: true,
@@ -132,4 +141,76 @@ func (s *BaseNodeServer) GetActiveSuperNodes(ctx context.Context, _ *emptypb.Emp
 
 	log.Printf("📡 Returned %d Super Nodes to client peer", len(list.Nodes))
 	return list, nil
+}
+
+func (b *BaseNodeServer) GetFilteredSuperNodes(count int32, minBW float32, maxLatency float32) []*SuperNodeInfo {
+	var filtered []*SuperNodeInfo
+	for _, sn := range b.registeredSuperNodes {
+		if sn.BandwidthMbps >= minBW && sn.AvgLatency <= maxLatency {
+			filtered = append(filtered, sn)
+		}
+	}
+
+	if len(filtered) > int(count) {
+		filtered = filtered[:count]
+	}
+
+	return filtered
+}
+
+func (s *BaseNodeServer) RequestExitRegion(ctx context.Context, req *pb.ExitRegionRequest) (*pb.SuperNodeList, error) {
+
+	if req.DesiredRegion == s.localRegion {
+		local := s.GetFilteredSuperNodes(req.Count, req.MinBandwidthMbps, req.MaxLatencyMs)
+		var list pb.SuperNodeList
+		for _, n := range local {
+			list.Nodes = append(list.Nodes, &pb.SuperNode{
+				NodeId:          n.NodeID,
+				Region:          n.Region,
+				Ip:              n.IP,
+				Port:            n.Port,
+				Version:         n.Version,
+				LatestHeartbeat: n.LastHeartbeat.Format(time.RFC3339),
+				IsAlive:         true,
+			})
+		}
+
+		return &list, nil
+	}
+
+	targetAddr := lookupBaseAddress(req.DesiredRegion)
+	if targetAddr == "" {
+		return nil, fmt.Errorf("No base node found for region %s", req.DesiredRegion)
+	}
+
+	remoteNodes, err := client.FetchRemoteSupers(targetAddr, req.DesiredRegion, req.Count, req.MinBandwidthMbps, req.MaxLatencyMs)
+	if err != nil {
+		return nil, err
+	}
+
+	var list pb.SuperNodeList
+	for _, sn := range remoteNodes {
+		list.Nodes = append(list.Nodes, &pb.SuperNode{
+			NodeId:  sn.NodeId,
+			Region:  sn.Region,
+			Ip:      sn.Ip,
+			Port:    sn.Port,
+			Version: "0.1",
+			IsAlive: true,
+		})
+	}
+
+	return &list, nil
+}
+
+func lookupBaseAddress(region string) string {
+	// TODO: Move this to config | env later
+	switch region {
+	case "US":
+		return "192.168.1.104:50051"
+	case "IN":
+		return "192.168.1.103:50051"
+	default:
+		return ""
+	}
 }

@@ -4,6 +4,7 @@ import (
 	"Client_peer/client"
 	basepb "Client_peer/pb"
 	"context"
+	"flag"
 	"fmt"
 	"log"
 
@@ -12,7 +13,11 @@ import (
 )
 
 func main() {
-	baseConn, err := grpc.Dial("localhost:50051", grpc.WithInsecure())
+	baseIP := flag.String("base-ip", "127.0.0.1", "IP address of the Base Node")
+	flag.Parse()
+
+	baseAddr := fmt.Sprintf("%s:50051", *baseIP)
+	baseConn, err := grpc.Dial(baseAddr, grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("❌ Failed to connect to base node: %v", err)
 	}

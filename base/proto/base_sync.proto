@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package dvpn;
+
+option go_package = "/pb";
+
+service BaseFederationService {
+    rpc RequestRemoteSuperNodes(RemoteSuperRequest) returns (RemoteSuperResponse);
+}
+
+message RemoteSuperRequest {
+    string target_region = 1;
+    int32 count = 2;
+    float required_bandWidth_mbps = 3;
+    float max_latency_ms = 4;
+}
+
+message SuperNodeInfo {
+    string node_id = 1;
+    string ip = 2;
+    string port = 3;
+    string region = 4;
+    float avg_latency_ms = 5;
+    int32 exit_peers_available = 6;
+    float bandWidth_mbps = 7;
+}
+
+message RemoteSuperResponse {
+    repeated SuperNodeInfo super_nodes = 1;
+}

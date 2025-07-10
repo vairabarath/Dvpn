@@ -3,6 +3,7 @@ package client
 import (
 	super "Super_node/crypto"
 	"Super_node/pb"
+	"Super_node/utils"
 	"context"
 	"encoding/base64"
 	"fmt"
@@ -36,13 +37,14 @@ func (s *SuperNode) Register() error {
 	}
 
 	nonce := super.GenerateNonce()
+	ip := utils.GetLocalIP()
 	fmt.Println(nonce)
-	sign := super.SignPayload(priv, s.id, "IN", "127.0.0.1", nonce)
+	sign := super.SignPayload(priv, s.id, "IN", ip, nonce)
 
 	req := &pb.RegisterRequest{
 		NodeId:      s.id,
 		Region:      "IN",
-		Ip:          "127.0.0.1",
+		Ip:          ip,
 		Port:        s.port,
 		PublicKey:   base64.StdEncoding.EncodeToString(pub),
 		Signature:   sign,
@@ -72,7 +74,6 @@ func (s *SuperNode) StartHeartbeat() {
 
 	for range ticker.C {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
-		defer cancel()
 
 		req := &pb.HeartbeatRequest{
 			NodeId:             s.id,
@@ -84,8 +85,9 @@ func (s *SuperNode) StartHeartbeat() {
 		}
 
 		res, err := s.client.SuperNodeHeartbeat(ctx, req)
+		cancel()
 		if err != nil {
-			log.Printf("Heartbeat failed: %v", err)
+			log.Printf("The base node went down. Heartbeat failed: %v", err)
 			continue
 		}
 

@@ -28,9 +28,19 @@ func main() {
 	region := flag.String("region", "IN", "Region code for the Super Node")
 	baseIP := flag.String("base-ip", "127.0.0.1", "IP address of the Base Node")
 
-	flag.Parse()
+	flag.Parse() // ✅ Parse BEFORE you access flag values
 
-	baseAddr := fmt.Sprintf("%s:50051", *baseIP)
+	var basePort int
+	switch *region {
+	case "IN":
+		basePort = 50051
+	case "US":
+		basePort = 50053 // ✅ use correct port for Base-US
+	default:
+		basePort = 50051 // fallback
+	}
+
+	baseAddr := fmt.Sprintf("%s:%d", *baseIP, basePort)
 	ip := utils.GetLocalIP()
 	addr := fmt.Sprintf("%s:%s", ip, *peerPort)
 
@@ -64,10 +74,20 @@ func main() {
 	}
 	defer conn.Close()
 
-	node := client.NewSupreNode(conn, finalID, *peerPort)
+	node := client.NewSupreNode(conn, finalID, *peerPort, *region)
 
 	if err := node.Register(); err != nil {
 		log.Fatalf("❌ Registration failed: %v", err)
+	}
+
+	exitNodes, err := node.RequestExitCandidates("US", 50.0, 200.0, 2)
+	if err != nil {
+		log.Fatalf("Failed to get exite Super Nodes: %v", err)
+	}
+
+	log.Printf("✅ Got %d exit candidates for US region:", len(exitNodes))
+	for _, node := range exitNodes {
+		log.Printf("🛰 %s (%s:%s)", node.NodeId, node.Ip, node.Port)
 	}
 
 	log.Println("✅ Super Node registered to Base Node. Starting heartbeat...")

@@ -17,13 +17,15 @@ type SuperNode struct {
 	client pb.BaseNodeServiceClient
 	id     string
 	port   string
+	region string
 }
 
-func NewSupreNode(conn *grpc.ClientConn, id string, port string) *SuperNode {
+func NewSupreNode(conn *grpc.ClientConn, id string, port string, region string) *SuperNode {
 	return &SuperNode{
 		client: pb.NewBaseNodeServiceClient(conn),
 		id:     id,
 		port:   port,
+		region: region,
 	}
 }
 
@@ -43,7 +45,7 @@ func (s *SuperNode) Register() error {
 
 	req := &pb.RegisterRequest{
 		NodeId:      s.id,
-		Region:      "IN",
+		Region:      s.region,
 		Ip:          ip,
 		Port:        s.port,
 		PublicKey:   base64.StdEncoding.EncodeToString(pub),
@@ -93,4 +95,23 @@ func (s *SuperNode) StartHeartbeat() {
 
 		log.Printf("Heartbeat sent: %s", res.Message)
 	}
+}
+
+func (s *SuperNode) RequestExitCandidates(region string, minBandwidth float32, maxLatency float32, count int32) ([]*pb.SuperNode, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+
+	req := &pb.ExitRegionRequest{
+		DesiredRegion:    region,
+		MinBandwidthMbps: minBandwidth,
+		MaxLatencyMs:     maxLatency,
+		Count:            count,
+	}
+
+	res, err := s.client.RequestExitRegion(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return res.Nodes, nil
 }

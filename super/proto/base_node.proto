@@ -4,12 +4,13 @@ package dvpn;
 
 import "google/protobuf/empty.proto";
 
-option go_package = "github.com/vairabarath/Dvpn/super/pb";
+option go_package = "/pb";
 
 service BaseNodeService {
     rpc RegisterSuperNode (RegisterRequest) returns (RegisterResponse);
     rpc SuperNodeHeartbeat (HeartbeatRequest) returns (Ack);
     rpc GetActiveSuperNodes (google.protobuf.Empty) returns (SuperNodeList);
+    rpc RequestExitRegion (ExitRegionRequest) returns (SuperNodeList);
 }
 
 message RegisterRequest {
@@ -54,8 +55,17 @@ message SuperNode {
     string latest_heartbeat = 5;
     bool is_alive = 6;
     string port = 7;
+    float avg_latency_ms = 8;
+    float bandwidth_mbps = 9;
 }
 
 message SuperNodeList {
     repeated SuperNode nodes = 1;
+}
+
+message ExitRegionRequest {
+    string desired_region = 1;
+    float min_bandwidth_mbps = 2;
+    float max_latency_ms = 3;
+    int32 count = 4;
 }

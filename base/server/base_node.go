@@ -207,7 +207,7 @@ func lookupBaseAddress(region string) string {
 	// TODO: Move this to config | env later
 	switch region {
 	case "US":
-		return "192.168.1.104:50051"
+		return "192.168.1.39:50053"
 	case "IN":
 		return "192.168.1.103:50051"
 	default:

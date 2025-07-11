@@ -23,6 +23,7 @@ const (
 	BaseNodeService_RegisterSuperNode_FullMethodName   = "/dvpn.BaseNodeService/RegisterSuperNode"
 	BaseNodeService_SuperNodeHeartbeat_FullMethodName  = "/dvpn.BaseNodeService/SuperNodeHeartbeat"
 	BaseNodeService_GetActiveSuperNodes_FullMethodName = "/dvpn.BaseNodeService/GetActiveSuperNodes"
+	BaseNodeService_RequestExitRegion_FullMethodName   = "/dvpn.BaseNodeService/RequestExitRegion"
 )
 
 // BaseNodeServiceClient is the client API for BaseNodeService service.
@@ -32,6 +33,7 @@ type BaseNodeServiceClient interface {
 	RegisterSuperNode(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
 	SuperNodeHeartbeat(ctx context.Context, in *HeartbeatRequest, opts ...grpc.CallOption) (*Ack, error)
 	GetActiveSuperNodes(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*SuperNodeList, error)
+	RequestExitRegion(ctx context.Context, in *ExitRegionRequest, opts ...grpc.CallOption) (*SuperNodeList, error)
 }
 
 type baseNodeServiceClient struct {
@@ -72,6 +74,16 @@ func (c *baseNodeServiceClient) GetActiveSuperNodes(ctx context.Context, in *emp
 	return out, nil
 }
 
+func (c *baseNodeServiceClient) RequestExitRegion(ctx context.Context, in *ExitRegionRequest, opts ...grpc.CallOption) (*SuperNodeList, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SuperNodeList)
+	err := c.cc.Invoke(ctx, BaseNodeService_RequestExitRegion_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // BaseNodeServiceServer is the server API for BaseNodeService service.
 // All implementations must embed UnimplementedBaseNodeServiceServer
 // for forward compatibility.
@@ -79,6 +91,7 @@ type BaseNodeServiceServer interface {
 	RegisterSuperNode(context.Context, *RegisterRequest) (*RegisterResponse, error)
 	SuperNodeHeartbeat(context.Context, *HeartbeatRequest) (*Ack, error)
 	GetActiveSuperNodes(context.Context, *emptypb.Empty) (*SuperNodeList, error)
+	RequestExitRegion(context.Context, *ExitRegionRequest) (*SuperNodeList, error)
 	mustEmbedUnimplementedBaseNodeServiceServer()
 }
 
@@ -97,6 +110,9 @@ func (UnimplementedBaseNodeServiceServer) SuperNodeHeartbeat(context.Context, *H
 }
 func (UnimplementedBaseNodeServiceServer) GetActiveSuperNodes(context.Context, *emptypb.Empty) (*SuperNodeList, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetActiveSuperNodes not implemented")
+}
+func (UnimplementedBaseNodeServiceServer) RequestExitRegion(context.Context, *ExitRegionRequest) (*SuperNodeList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RequestExitRegion not implemented")
 }
 func (UnimplementedBaseNodeServiceServer) mustEmbedUnimplementedBaseNodeServiceServer() {}
 func (UnimplementedBaseNodeServiceServer) testEmbeddedByValue()                         {}
@@ -173,6 +189,24 @@ func _BaseNodeService_GetActiveSuperNodes_Handler(srv interface{}, ctx context.C
 	return interceptor(ctx, in, info, handler)
 }
 
+func _BaseNodeService_RequestExitRegion_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ExitRegionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BaseNodeServiceServer).RequestExitRegion(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BaseNodeService_RequestExitRegion_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BaseNodeServiceServer).RequestExitRegion(ctx, req.(*ExitRegionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // BaseNodeService_ServiceDesc is the grpc.ServiceDesc for BaseNodeService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -191,6 +225,10 @@ var BaseNodeService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetActiveSuperNodes",
 			Handler:    _BaseNodeService_GetActiveSuperNodes_Handler,
+		},
+		{
+			MethodName: "RequestExitRegion",
+			Handler:    _BaseNodeService_RequestExitRegion_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

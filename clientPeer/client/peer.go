@@ -82,3 +82,29 @@ func (cp *ClientPeer) StartHeartbeat() {
 		log.Printf("Heartbeat sent: %s", res.Message)
 	}
 }
+
+func (cp *ClientPeer) RequestExit(region string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+
+	req := &pb.ExitRequest{
+		PeerId:          cp.id,
+		RequestedRegion: region,
+	}
+
+	res, err := cp.client.RequestExit(ctx, req)
+	if err != nil {
+		return fmt.Errorf("failed to request exit: %w", err)
+	}
+
+	log.Println("🎯 Received WireGuard Config:")
+	log.Printf("Interface Private Key: %s", res.InterfacePrivateKey)
+	log.Printf("Interface Address:    %s", res.InterfaceAddress)
+	log.Printf("DNS:                  %s", res.Dns)
+	log.Printf("Peer Public Key:      %s", res.PeerPublicKey)
+	log.Printf("Peer Endpoint:        %s", res.PeerEndpoint)
+	log.Printf("Allowed IPs:          %s", res.AllowedIps)
+	log.Printf("Keepalive:            %d", res.Keepalive)
+
+	return nil
+}

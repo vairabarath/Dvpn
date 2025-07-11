@@ -8,7 +8,6 @@ package pb
 
 import (
 	context "context"
-
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -22,6 +21,8 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	SuperNodeService_RegisterClientPeer_FullMethodName   = "/dvpn.SuperNodeService/RegisterClientPeer"
 	SuperNodeService_PeerSessionHeartbeat_FullMethodName = "/dvpn.SuperNodeService/PeerSessionHeartbeat"
+	SuperNodeService_RequestExitPeer_FullMethodName      = "/dvpn.SuperNodeService/RequestExitPeer"
+	SuperNodeService_RequestExit_FullMethodName          = "/dvpn.SuperNodeService/RequestExit"
 )
 
 // SuperNodeServiceClient is the client API for SuperNodeService service.
@@ -30,6 +31,8 @@ const (
 type SuperNodeServiceClient interface {
 	RegisterClientPeer(ctx context.Context, in *PeerRegistrationRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
 	PeerSessionHeartbeat(ctx context.Context, in *PeerSessionHeartbeatRequest, opts ...grpc.CallOption) (*Ack, error)
+	RequestExitPeer(ctx context.Context, in *ExitPeerRequest, opts ...grpc.CallOption) (*ExitPeerResponse, error)
+	RequestExit(ctx context.Context, in *ExitRequest, opts ...grpc.CallOption) (*WireguardConfig, error)
 }
 
 type superNodeServiceClient struct {
@@ -60,12 +63,34 @@ func (c *superNodeServiceClient) PeerSessionHeartbeat(ctx context.Context, in *P
 	return out, nil
 }
 
+func (c *superNodeServiceClient) RequestExitPeer(ctx context.Context, in *ExitPeerRequest, opts ...grpc.CallOption) (*ExitPeerResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ExitPeerResponse)
+	err := c.cc.Invoke(ctx, SuperNodeService_RequestExitPeer_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *superNodeServiceClient) RequestExit(ctx context.Context, in *ExitRequest, opts ...grpc.CallOption) (*WireguardConfig, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(WireguardConfig)
+	err := c.cc.Invoke(ctx, SuperNodeService_RequestExit_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // SuperNodeServiceServer is the server API for SuperNodeService service.
 // All implementations must embed UnimplementedSuperNodeServiceServer
 // for forward compatibility.
 type SuperNodeServiceServer interface {
 	RegisterClientPeer(context.Context, *PeerRegistrationRequest) (*RegisterResponse, error)
 	PeerSessionHeartbeat(context.Context, *PeerSessionHeartbeatRequest) (*Ack, error)
+	RequestExitPeer(context.Context, *ExitPeerRequest) (*ExitPeerResponse, error)
+	RequestExit(context.Context, *ExitRequest) (*WireguardConfig, error)
 	mustEmbedUnimplementedSuperNodeServiceServer()
 }
 
@@ -81,6 +106,12 @@ func (UnimplementedSuperNodeServiceServer) RegisterClientPeer(context.Context, *
 }
 func (UnimplementedSuperNodeServiceServer) PeerSessionHeartbeat(context.Context, *PeerSessionHeartbeatRequest) (*Ack, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PeerSessionHeartbeat not implemented")
+}
+func (UnimplementedSuperNodeServiceServer) RequestExitPeer(context.Context, *ExitPeerRequest) (*ExitPeerResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RequestExitPeer not implemented")
+}
+func (UnimplementedSuperNodeServiceServer) RequestExit(context.Context, *ExitRequest) (*WireguardConfig, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RequestExit not implemented")
 }
 func (UnimplementedSuperNodeServiceServer) mustEmbedUnimplementedSuperNodeServiceServer() {}
 func (UnimplementedSuperNodeServiceServer) testEmbeddedByValue()                          {}
@@ -139,6 +170,42 @@ func _SuperNodeService_PeerSessionHeartbeat_Handler(srv interface{}, ctx context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _SuperNodeService_RequestExitPeer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ExitPeerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SuperNodeServiceServer).RequestExitPeer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SuperNodeService_RequestExitPeer_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SuperNodeServiceServer).RequestExitPeer(ctx, req.(*ExitPeerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SuperNodeService_RequestExit_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ExitRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SuperNodeServiceServer).RequestExit(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SuperNodeService_RequestExit_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SuperNodeServiceServer).RequestExit(ctx, req.(*ExitRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // SuperNodeService_ServiceDesc is the grpc.ServiceDesc for SuperNodeService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -153,6 +220,14 @@ var SuperNodeService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "PeerSessionHeartbeat",
 			Handler:    _SuperNodeService_PeerSessionHeartbeat_Handler,
+		},
+		{
+			MethodName: "RequestExitPeer",
+			Handler:    _SuperNodeService_RequestExitPeer_Handler,
+		},
+		{
+			MethodName: "RequestExit",
+			Handler:    _SuperNodeService_RequestExit_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

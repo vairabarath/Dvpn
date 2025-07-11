@@ -205,6 +205,318 @@ func (x *PeerSessionHeartbeatRequest) GetSessionUptimeSecs() int32 {
 	return 0
 }
 
+type ExitPeerRequest struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	RequesterId      string                 `protobuf:"bytes,1,opt,name=requester_id,json=requesterId,proto3" json:"requester_id,omitempty"`
+	MinBandwidthMbps float32                `protobuf:"fixed32,2,opt,name=min_bandwidth_mbps,json=minBandwidthMbps,proto3" json:"min_bandwidth_mbps,omitempty"`
+	MaxLatencyMs     float32                `protobuf:"fixed32,3,opt,name=max_latency_ms,json=maxLatencyMs,proto3" json:"max_latency_ms,omitempty"`
+	RequestedRegion  string                 `protobuf:"bytes,4,opt,name=requested_region,json=requestedRegion,proto3" json:"requested_region,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *ExitPeerRequest) Reset() {
+	*x = ExitPeerRequest{}
+	mi := &file_super_node_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ExitPeerRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ExitPeerRequest) ProtoMessage() {}
+
+func (x *ExitPeerRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_super_node_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ExitPeerRequest.ProtoReflect.Descriptor instead.
+func (*ExitPeerRequest) Descriptor() ([]byte, []int) {
+	return file_super_node_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *ExitPeerRequest) GetRequesterId() string {
+	if x != nil {
+		return x.RequesterId
+	}
+	return ""
+}
+
+func (x *ExitPeerRequest) GetMinBandwidthMbps() float32 {
+	if x != nil {
+		return x.MinBandwidthMbps
+	}
+	return 0
+}
+
+func (x *ExitPeerRequest) GetMaxLatencyMs() float32 {
+	if x != nil {
+		return x.MaxLatencyMs
+	}
+	return 0
+}
+
+func (x *ExitPeerRequest) GetRequestedRegion() string {
+	if x != nil {
+		return x.RequestedRegion
+	}
+	return ""
+}
+
+type ExitPeerResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PublicKey     string                 `protobuf:"bytes,1,opt,name=public_key,json=publicKey,proto3" json:"public_key,omitempty"`
+	EndpointIp    string                 `protobuf:"bytes,2,opt,name=endpoint_ip,json=endpointIp,proto3" json:"endpoint_ip,omitempty"`
+	EndpointPort  string                 `protobuf:"bytes,3,opt,name=endpoint_port,json=endpointPort,proto3" json:"endpoint_port,omitempty"`
+	AllowedIps    string                 `protobuf:"bytes,4,opt,name=allowed_ips,json=allowedIps,proto3" json:"allowed_ips,omitempty"`
+	PeerId        string                 `protobuf:"bytes,5,opt,name=peer_id,json=peerId,proto3" json:"peer_id,omitempty"`
+	Region        string                 `protobuf:"bytes,6,opt,name=region,proto3" json:"region,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ExitPeerResponse) Reset() {
+	*x = ExitPeerResponse{}
+	mi := &file_super_node_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ExitPeerResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ExitPeerResponse) ProtoMessage() {}
+
+func (x *ExitPeerResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_super_node_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ExitPeerResponse.ProtoReflect.Descriptor instead.
+func (*ExitPeerResponse) Descriptor() ([]byte, []int) {
+	return file_super_node_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *ExitPeerResponse) GetPublicKey() string {
+	if x != nil {
+		return x.PublicKey
+	}
+	return ""
+}
+
+func (x *ExitPeerResponse) GetEndpointIp() string {
+	if x != nil {
+		return x.EndpointIp
+	}
+	return ""
+}
+
+func (x *ExitPeerResponse) GetEndpointPort() string {
+	if x != nil {
+		return x.EndpointPort
+	}
+	return ""
+}
+
+func (x *ExitPeerResponse) GetAllowedIps() string {
+	if x != nil {
+		return x.AllowedIps
+	}
+	return ""
+}
+
+func (x *ExitPeerResponse) GetPeerId() string {
+	if x != nil {
+		return x.PeerId
+	}
+	return ""
+}
+
+func (x *ExitPeerResponse) GetRegion() string {
+	if x != nil {
+		return x.Region
+	}
+	return ""
+}
+
+type ExitRequest struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	PeerId           string                 `protobuf:"bytes,1,opt,name=peer_id,json=peerId,proto3" json:"peer_id,omitempty"`
+	RequestedRegion  string                 `protobuf:"bytes,2,opt,name=requested_region,json=requestedRegion,proto3" json:"requested_region,omitempty"`
+	MinBandwidthMbps float32                `protobuf:"fixed32,3,opt,name=min_bandwidth_mbps,json=minBandwidthMbps,proto3" json:"min_bandwidth_mbps,omitempty"`
+	MaxLatencyMs     float32                `protobuf:"fixed32,4,opt,name=max_latency_ms,json=maxLatencyMs,proto3" json:"max_latency_ms,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *ExitRequest) Reset() {
+	*x = ExitRequest{}
+	mi := &file_super_node_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ExitRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ExitRequest) ProtoMessage() {}
+
+func (x *ExitRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_super_node_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ExitRequest.ProtoReflect.Descriptor instead.
+func (*ExitRequest) Descriptor() ([]byte, []int) {
+	return file_super_node_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *ExitRequest) GetPeerId() string {
+	if x != nil {
+		return x.PeerId
+	}
+	return ""
+}
+
+func (x *ExitRequest) GetRequestedRegion() string {
+	if x != nil {
+		return x.RequestedRegion
+	}
+	return ""
+}
+
+func (x *ExitRequest) GetMinBandwidthMbps() float32 {
+	if x != nil {
+		return x.MinBandwidthMbps
+	}
+	return 0
+}
+
+func (x *ExitRequest) GetMaxLatencyMs() float32 {
+	if x != nil {
+		return x.MaxLatencyMs
+	}
+	return 0
+}
+
+type WireguardConfig struct {
+	state               protoimpl.MessageState `protogen:"open.v1"`
+	InterfacePrivateKey string                 `protobuf:"bytes,1,opt,name=interface_private_key,json=interfacePrivateKey,proto3" json:"interface_private_key,omitempty"`
+	InterfaceAddress    string                 `protobuf:"bytes,2,opt,name=interface_address,json=interfaceAddress,proto3" json:"interface_address,omitempty"`
+	Dns                 string                 `protobuf:"bytes,3,opt,name=dns,proto3" json:"dns,omitempty"`
+	PeerPublicKey       string                 `protobuf:"bytes,4,opt,name=peer_public_key,json=peerPublicKey,proto3" json:"peer_public_key,omitempty"`
+	PeerEndpoint        string                 `protobuf:"bytes,5,opt,name=peer_endpoint,json=peerEndpoint,proto3" json:"peer_endpoint,omitempty"`
+	AllowedIps          string                 `protobuf:"bytes,6,opt,name=allowed_ips,json=allowedIps,proto3" json:"allowed_ips,omitempty"`
+	Keepalive           int32                  `protobuf:"varint,7,opt,name=keepalive,proto3" json:"keepalive,omitempty"`
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
+}
+
+func (x *WireguardConfig) Reset() {
+	*x = WireguardConfig{}
+	mi := &file_super_node_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *WireguardConfig) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*WireguardConfig) ProtoMessage() {}
+
+func (x *WireguardConfig) ProtoReflect() protoreflect.Message {
+	mi := &file_super_node_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use WireguardConfig.ProtoReflect.Descriptor instead.
+func (*WireguardConfig) Descriptor() ([]byte, []int) {
+	return file_super_node_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *WireguardConfig) GetInterfacePrivateKey() string {
+	if x != nil {
+		return x.InterfacePrivateKey
+	}
+	return ""
+}
+
+func (x *WireguardConfig) GetInterfaceAddress() string {
+	if x != nil {
+		return x.InterfaceAddress
+	}
+	return ""
+}
+
+func (x *WireguardConfig) GetDns() string {
+	if x != nil {
+		return x.Dns
+	}
+	return ""
+}
+
+func (x *WireguardConfig) GetPeerPublicKey() string {
+	if x != nil {
+		return x.PeerPublicKey
+	}
+	return ""
+}
+
+func (x *WireguardConfig) GetPeerEndpoint() string {
+	if x != nil {
+		return x.PeerEndpoint
+	}
+	return ""
+}
+
+func (x *WireguardConfig) GetAllowedIps() string {
+	if x != nil {
+		return x.AllowedIps
+	}
+	return ""
+}
+
+func (x *WireguardConfig) GetKeepalive() int32 {
+	if x != nil {
+		return x.Keepalive
+	}
+	return 0
+}
+
 var File_super_node_proto protoreflect.FileDescriptor
 
 const file_super_node_proto_rawDesc = "" +
@@ -229,10 +541,41 @@ const file_super_node_proto_rawDesc = "" +
 	"\vpacket_loss\x18\x04 \x01(\x02R\n" +
 	"packetLoss\x12'\n" +
 	"\x0fthroughput_mbps\x18\x05 \x01(\x02R\x0ethroughputMbps\x12.\n" +
-	"\x13session_uptime_secs\x18\x06 \x01(\x05R\x11sessionUptimeSecs2\xa5\x01\n" +
+	"\x13session_uptime_secs\x18\x06 \x01(\x05R\x11sessionUptimeSecs\"\xb3\x01\n" +
+	"\x0fExitPeerRequest\x12!\n" +
+	"\frequester_id\x18\x01 \x01(\tR\vrequesterId\x12,\n" +
+	"\x12min_bandwidth_mbps\x18\x02 \x01(\x02R\x10minBandwidthMbps\x12$\n" +
+	"\x0emax_latency_ms\x18\x03 \x01(\x02R\fmaxLatencyMs\x12)\n" +
+	"\x10requested_region\x18\x04 \x01(\tR\x0frequestedRegion\"\xc9\x01\n" +
+	"\x10ExitPeerResponse\x12\x1d\n" +
+	"\n" +
+	"public_key\x18\x01 \x01(\tR\tpublicKey\x12\x1f\n" +
+	"\vendpoint_ip\x18\x02 \x01(\tR\n" +
+	"endpointIp\x12#\n" +
+	"\rendpoint_port\x18\x03 \x01(\tR\fendpointPort\x12\x1f\n" +
+	"\vallowed_ips\x18\x04 \x01(\tR\n" +
+	"allowedIps\x12\x17\n" +
+	"\apeer_id\x18\x05 \x01(\tR\x06peerId\x12\x16\n" +
+	"\x06region\x18\x06 \x01(\tR\x06region\"\xa5\x01\n" +
+	"\vExitRequest\x12\x17\n" +
+	"\apeer_id\x18\x01 \x01(\tR\x06peerId\x12)\n" +
+	"\x10requested_region\x18\x02 \x01(\tR\x0frequestedRegion\x12,\n" +
+	"\x12min_bandwidth_mbps\x18\x03 \x01(\x02R\x10minBandwidthMbps\x12$\n" +
+	"\x0emax_latency_ms\x18\x04 \x01(\x02R\fmaxLatencyMs\"\x90\x02\n" +
+	"\x0fWireguardConfig\x122\n" +
+	"\x15interface_private_key\x18\x01 \x01(\tR\x13interfacePrivateKey\x12+\n" +
+	"\x11interface_address\x18\x02 \x01(\tR\x10interfaceAddress\x12\x10\n" +
+	"\x03dns\x18\x03 \x01(\tR\x03dns\x12&\n" +
+	"\x0fpeer_public_key\x18\x04 \x01(\tR\rpeerPublicKey\x12#\n" +
+	"\rpeer_endpoint\x18\x05 \x01(\tR\fpeerEndpoint\x12\x1f\n" +
+	"\vallowed_ips\x18\x06 \x01(\tR\n" +
+	"allowedIps\x12\x1c\n" +
+	"\tkeepalive\x18\a \x01(\x05R\tkeepalive2\xa0\x02\n" +
 	"\x10SuperNodeService\x12K\n" +
 	"\x12RegisterClientPeer\x12\x1d.dvpn.PeerRegistrationRequest\x1a\x16.dvpn.RegisterResponse\x12D\n" +
-	"\x14PeerSessionHeartbeat\x12!.dvpn.PeerSessionHeartbeatRequest\x1a\t.dvpn.AckB&Z$github.com/vairabarath/Dvpn/super/pbb\x06proto3"
+	"\x14PeerSessionHeartbeat\x12!.dvpn.PeerSessionHeartbeatRequest\x1a\t.dvpn.Ack\x12@\n" +
+	"\x0fRequestExitPeer\x12\x15.dvpn.ExitPeerRequest\x1a\x16.dvpn.ExitPeerResponse\x127\n" +
+	"\vRequestExit\x12\x11.dvpn.ExitRequest\x1a\x15.dvpn.WireguardConfigB\x05Z\x03/pbb\x06proto3"
 
 var (
 	file_super_node_proto_rawDescOnce sync.Once
@@ -246,20 +589,28 @@ func file_super_node_proto_rawDescGZIP() []byte {
 	return file_super_node_proto_rawDescData
 }
 
-var file_super_node_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_super_node_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_super_node_proto_goTypes = []any{
 	(*PeerRegistrationRequest)(nil),     // 0: dvpn.PeerRegistrationRequest
 	(*PeerSessionHeartbeatRequest)(nil), // 1: dvpn.PeerSessionHeartbeatRequest
-	(*RegisterResponse)(nil),            // 2: dvpn.RegisterResponse
-	(*Ack)(nil),                         // 3: dvpn.Ack
+	(*ExitPeerRequest)(nil),             // 2: dvpn.ExitPeerRequest
+	(*ExitPeerResponse)(nil),            // 3: dvpn.ExitPeerResponse
+	(*ExitRequest)(nil),                 // 4: dvpn.ExitRequest
+	(*WireguardConfig)(nil),             // 5: dvpn.WireguardConfig
+	(*RegisterResponse)(nil),            // 6: dvpn.RegisterResponse
+	(*Ack)(nil),                         // 7: dvpn.Ack
 }
 var file_super_node_proto_depIdxs = []int32{
 	0, // 0: dvpn.SuperNodeService.RegisterClientPeer:input_type -> dvpn.PeerRegistrationRequest
 	1, // 1: dvpn.SuperNodeService.PeerSessionHeartbeat:input_type -> dvpn.PeerSessionHeartbeatRequest
-	2, // 2: dvpn.SuperNodeService.RegisterClientPeer:output_type -> dvpn.RegisterResponse
-	3, // 3: dvpn.SuperNodeService.PeerSessionHeartbeat:output_type -> dvpn.Ack
-	2, // [2:4] is the sub-list for method output_type
-	0, // [0:2] is the sub-list for method input_type
+	2, // 2: dvpn.SuperNodeService.RequestExitPeer:input_type -> dvpn.ExitPeerRequest
+	4, // 3: dvpn.SuperNodeService.RequestExit:input_type -> dvpn.ExitRequest
+	6, // 4: dvpn.SuperNodeService.RegisterClientPeer:output_type -> dvpn.RegisterResponse
+	7, // 5: dvpn.SuperNodeService.PeerSessionHeartbeat:output_type -> dvpn.Ack
+	3, // 6: dvpn.SuperNodeService.RequestExitPeer:output_type -> dvpn.ExitPeerResponse
+	5, // 7: dvpn.SuperNodeService.RequestExit:output_type -> dvpn.WireguardConfig
+	4, // [4:8] is the sub-list for method output_type
+	0, // [0:4] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
@@ -277,7 +628,7 @@ func file_super_node_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_super_node_proto_rawDesc), len(file_super_node_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

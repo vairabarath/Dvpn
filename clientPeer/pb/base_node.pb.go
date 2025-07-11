@@ -351,6 +351,8 @@ type SuperNode struct {
 	LatestHeartbeat string                 `protobuf:"bytes,5,opt,name=latest_heartbeat,json=latestHeartbeat,proto3" json:"latest_heartbeat,omitempty"`
 	IsAlive         bool                   `protobuf:"varint,6,opt,name=is_alive,json=isAlive,proto3" json:"is_alive,omitempty"`
 	Port            string                 `protobuf:"bytes,7,opt,name=port,proto3" json:"port,omitempty"`
+	AvgLatencyMs    float32                `protobuf:"fixed32,8,opt,name=avg_latency_ms,json=avgLatencyMs,proto3" json:"avg_latency_ms,omitempty"`
+	BandwidthMbps   float32                `protobuf:"fixed32,9,opt,name=bandwidth_mbps,json=bandwidthMbps,proto3" json:"bandwidth_mbps,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -434,6 +436,20 @@ func (x *SuperNode) GetPort() string {
 	return ""
 }
 
+func (x *SuperNode) GetAvgLatencyMs() float32 {
+	if x != nil {
+		return x.AvgLatencyMs
+	}
+	return 0
+}
+
+func (x *SuperNode) GetBandwidthMbps() float32 {
+	if x != nil {
+		return x.BandwidthMbps
+	}
+	return 0
+}
+
 type SuperNodeList struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Nodes         []*SuperNode           `protobuf:"bytes,1,rep,name=nodes,proto3" json:"nodes,omitempty"`
@@ -478,6 +494,74 @@ func (x *SuperNodeList) GetNodes() []*SuperNode {
 	return nil
 }
 
+type ExitRegionRequest struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	DesiredRegion    string                 `protobuf:"bytes,1,opt,name=desired_region,json=desiredRegion,proto3" json:"desired_region,omitempty"`
+	MinBandwidthMbps float32                `protobuf:"fixed32,2,opt,name=min_bandwidth_mbps,json=minBandwidthMbps,proto3" json:"min_bandwidth_mbps,omitempty"`
+	MaxLatencyMs     float32                `protobuf:"fixed32,3,opt,name=max_latency_ms,json=maxLatencyMs,proto3" json:"max_latency_ms,omitempty"`
+	Count            int32                  `protobuf:"varint,4,opt,name=count,proto3" json:"count,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *ExitRegionRequest) Reset() {
+	*x = ExitRegionRequest{}
+	mi := &file_base_node_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ExitRegionRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ExitRegionRequest) ProtoMessage() {}
+
+func (x *ExitRegionRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_base_node_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ExitRegionRequest.ProtoReflect.Descriptor instead.
+func (*ExitRegionRequest) Descriptor() ([]byte, []int) {
+	return file_base_node_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *ExitRegionRequest) GetDesiredRegion() string {
+	if x != nil {
+		return x.DesiredRegion
+	}
+	return ""
+}
+
+func (x *ExitRegionRequest) GetMinBandwidthMbps() float32 {
+	if x != nil {
+		return x.MinBandwidthMbps
+	}
+	return 0
+}
+
+func (x *ExitRegionRequest) GetMaxLatencyMs() float32 {
+	if x != nil {
+		return x.MaxLatencyMs
+	}
+	return 0
+}
+
+func (x *ExitRegionRequest) GetCount() int32 {
+	if x != nil {
+		return x.Count
+	}
+	return 0
+}
+
 var File_base_node_proto protoreflect.FileDescriptor
 
 const file_base_node_proto_rawDesc = "" +
@@ -511,7 +595,7 @@ const file_base_node_proto_rawDesc = "" +
 	"\ttimestamp\x18\x06 \x01(\tR\ttimestamp\";\n" +
 	"\x03Ack\x12\x1a\n" +
 	"\breceived\x18\x01 \x01(\bR\breceived\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\"\xc0\x01\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"\x8d\x02\n" +
 	"\tSuperNode\x12\x17\n" +
 	"\anode_id\x18\x01 \x01(\tR\x06nodeId\x12\x16\n" +
 	"\x06region\x18\x02 \x01(\tR\x06region\x12\x0e\n" +
@@ -519,13 +603,21 @@ const file_base_node_proto_rawDesc = "" +
 	"\aversion\x18\x04 \x01(\tR\aversion\x12)\n" +
 	"\x10latest_heartbeat\x18\x05 \x01(\tR\x0flatestHeartbeat\x12\x19\n" +
 	"\bis_alive\x18\x06 \x01(\bR\aisAlive\x12\x12\n" +
-	"\x04port\x18\a \x01(\tR\x04port\"6\n" +
+	"\x04port\x18\a \x01(\tR\x04port\x12$\n" +
+	"\x0eavg_latency_ms\x18\b \x01(\x02R\favgLatencyMs\x12%\n" +
+	"\x0ebandwidth_mbps\x18\t \x01(\x02R\rbandwidthMbps\"6\n" +
 	"\rSuperNodeList\x12%\n" +
-	"\x05nodes\x18\x01 \x03(\v2\x0f.dvpn.SuperNodeR\x05nodes2\xd2\x01\n" +
+	"\x05nodes\x18\x01 \x03(\v2\x0f.dvpn.SuperNodeR\x05nodes\"\xa4\x01\n" +
+	"\x11ExitRegionRequest\x12%\n" +
+	"\x0edesired_region\x18\x01 \x01(\tR\rdesiredRegion\x12,\n" +
+	"\x12min_bandwidth_mbps\x18\x02 \x01(\x02R\x10minBandwidthMbps\x12$\n" +
+	"\x0emax_latency_ms\x18\x03 \x01(\x02R\fmaxLatencyMs\x12\x14\n" +
+	"\x05count\x18\x04 \x01(\x05R\x05count2\x95\x02\n" +
 	"\x0fBaseNodeService\x12B\n" +
 	"\x11RegisterSuperNode\x12\x15.dvpn.RegisterRequest\x1a\x16.dvpn.RegisterResponse\x127\n" +
 	"\x12SuperNodeHeartbeat\x12\x16.dvpn.HeartbeatRequest\x1a\t.dvpn.Ack\x12B\n" +
-	"\x13GetActiveSuperNodes\x12\x16.google.protobuf.Empty\x1a\x13.dvpn.SuperNodeListB+Z)github.com/vairabarath/Dvpn/clientPeer/pbb\x06proto3"
+	"\x13GetActiveSuperNodes\x12\x16.google.protobuf.Empty\x1a\x13.dvpn.SuperNodeList\x12A\n" +
+	"\x11RequestExitRegion\x12\x17.dvpn.ExitRegionRequest\x1a\x13.dvpn.SuperNodeListB\x05Z\x03/pbb\x06proto3"
 
 var (
 	file_base_node_proto_rawDescOnce sync.Once
@@ -539,26 +631,29 @@ func file_base_node_proto_rawDescGZIP() []byte {
 	return file_base_node_proto_rawDescData
 }
 
-var file_base_node_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_base_node_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_base_node_proto_goTypes = []any{
-	(*RegisterRequest)(nil),  // 0: dvpn.RegisterRequest
-	(*RegisterResponse)(nil), // 1: dvpn.RegisterResponse
-	(*HeartbeatRequest)(nil), // 2: dvpn.HeartbeatRequest
-	(*Ack)(nil),              // 3: dvpn.Ack
-	(*SuperNode)(nil),        // 4: dvpn.SuperNode
-	(*SuperNodeList)(nil),    // 5: dvpn.SuperNodeList
-	(*emptypb.Empty)(nil),    // 6: google.protobuf.Empty
+	(*RegisterRequest)(nil),   // 0: dvpn.RegisterRequest
+	(*RegisterResponse)(nil),  // 1: dvpn.RegisterResponse
+	(*HeartbeatRequest)(nil),  // 2: dvpn.HeartbeatRequest
+	(*Ack)(nil),               // 3: dvpn.Ack
+	(*SuperNode)(nil),         // 4: dvpn.SuperNode
+	(*SuperNodeList)(nil),     // 5: dvpn.SuperNodeList
+	(*ExitRegionRequest)(nil), // 6: dvpn.ExitRegionRequest
+	(*emptypb.Empty)(nil),     // 7: google.protobuf.Empty
 }
 var file_base_node_proto_depIdxs = []int32{
 	4, // 0: dvpn.SuperNodeList.nodes:type_name -> dvpn.SuperNode
 	0, // 1: dvpn.BaseNodeService.RegisterSuperNode:input_type -> dvpn.RegisterRequest
 	2, // 2: dvpn.BaseNodeService.SuperNodeHeartbeat:input_type -> dvpn.HeartbeatRequest
-	6, // 3: dvpn.BaseNodeService.GetActiveSuperNodes:input_type -> google.protobuf.Empty
-	1, // 4: dvpn.BaseNodeService.RegisterSuperNode:output_type -> dvpn.RegisterResponse
-	3, // 5: dvpn.BaseNodeService.SuperNodeHeartbeat:output_type -> dvpn.Ack
-	5, // 6: dvpn.BaseNodeService.GetActiveSuperNodes:output_type -> dvpn.SuperNodeList
-	4, // [4:7] is the sub-list for method output_type
-	1, // [1:4] is the sub-list for method input_type
+	7, // 3: dvpn.BaseNodeService.GetActiveSuperNodes:input_type -> google.protobuf.Empty
+	6, // 4: dvpn.BaseNodeService.RequestExitRegion:input_type -> dvpn.ExitRegionRequest
+	1, // 5: dvpn.BaseNodeService.RegisterSuperNode:output_type -> dvpn.RegisterResponse
+	3, // 6: dvpn.BaseNodeService.SuperNodeHeartbeat:output_type -> dvpn.Ack
+	5, // 7: dvpn.BaseNodeService.GetActiveSuperNodes:output_type -> dvpn.SuperNodeList
+	5, // 8: dvpn.BaseNodeService.RequestExitRegion:output_type -> dvpn.SuperNodeList
+	5, // [5:9] is the sub-list for method output_type
+	1, // [1:5] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name
 	1, // [1:1] is the sub-list for extension extendee
 	0, // [0:1] is the sub-list for field type_name
@@ -575,7 +670,7 @@ func file_base_node_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_base_node_proto_rawDesc), len(file_base_node_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   6,
+			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

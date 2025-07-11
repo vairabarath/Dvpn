@@ -22,41 +22,55 @@ func generateRandomID(region string) string {
 	}
 	return fmt.Sprintf("super-%s-%s", region, hex.EncodeToString(b))
 }
+
 func main() {
-	peerPort := flag.String("peer-port", ":50052", "Port for Super Node Server")
-	nodeID := flag.String("id", "", "Node ID (optional, will auto-generate if blank)")
-	region := flag.String("region", "IN", "Region code for the Super Node")
-	baseIP := flag.String("base-ip", "127.0.0.1", "IP address of the Base Node")
-
-	flag.Parse() // ✅ Parse BEFORE you access flag values
-
-	var basePort int
-	switch *region {
-	case "IN":
-		basePort = 50051
-	case "US":
-		basePort = 50053 // ✅ use correct port for Base-US
-	default:
-		basePort = 50051 // fallback
-	}
-
-	baseAddr := fmt.Sprintf("%s:%d", *baseIP, basePort)
-	ip := utils.GetLocalIP()
-	addr := fmt.Sprintf("%s:%s", ip, *peerPort)
+	// 🏁 CLI flags
+	peerPort := flag.String("peer-port", "50052", "Port for Super Node Server")
+	nodeID := flag.String("id", "", "Node ID (optional)")
+	region := flag.String("region", "IN", "Region code for Super Node")
+	baseIP := flag.String("base-ip", "127.0.0.1", "Base Node IP address")
+	flag.Parse()
 
 	finalID := *nodeID
 	if finalID == "" {
 		finalID = generateRandomID(*region)
 	}
-	// Step 1: Start gRPC server for Client Peers
+
+	// 🌐 Choose Base Node port based on region
+	basePort := map[string]int{
+		"IN": 50051,
+		"US": 50053,
+	}[*region]
+	if basePort == 0 {
+		basePort = 50051
+	}
+	baseAddr := fmt.Sprintf("%s:%d", *baseIP, basePort)
+
+	// 🎯 Super Node's listen address
+	localIP := utils.GetLocalIP()
+	superNodeAddr := fmt.Sprintf("%s:%s", localIP, *peerPort)
+
+	// 🌐 Dial base node
+	conn, err := grpc.Dial(baseAddr, grpc.WithInsecure())
+	if err != nil {
+		log.Fatalf("❌ Failed to connect to base node: %v", err)
+	}
+	defer conn.Close()
+
+	// Create reusable gRPC client for base
+	baseClient := pb.NewBaseNodeServiceClient(conn)
+
+	// 👂 Start gRPC server for client peers
 	go func() {
-		lis, err := net.Listen("tcp", addr)
+		lis, err := net.Listen("tcp", superNodeAddr)
 		if err != nil {
 			log.Fatalf("Failed to listen: %v", err)
 		}
 
 		grpcServer := grpc.NewServer()
-		superNodeServer := server.NewSupreNodeServer()
+
+		// ⬇️ Pass baseClient into server handler
+		superNodeServer := server.NewSupreNodeServer(baseClient)
 		superNodeServer.StartPeerMonitoring()
 
 		pb.RegisterSuperNodeServiceServer(grpcServer, superNodeServer)
@@ -67,31 +81,14 @@ func main() {
 		}
 	}()
 
-	// Step 2: Connect to Base Node as a gRPC client
-	conn, err := grpc.Dial(baseAddr, grpc.WithInsecure())
-	if err != nil {
-		log.Fatalf("❌ Failed to connect to base node: %v", err)
-	}
-	defer conn.Close()
-
+	// 🔐 Register this Super Node to base
 	node := client.NewSupreNode(conn, finalID, *peerPort, *region)
-
 	if err := node.Register(); err != nil {
 		log.Fatalf("❌ Registration failed: %v", err)
 	}
 
-	exitNodes, err := node.RequestExitCandidates("US", 50.0, 200.0, 2)
-	if err != nil {
-		log.Fatalf("Failed to get exite Super Nodes: %v", err)
-	}
-
-	log.Printf("✅ Got %d exit candidates for US region:", len(exitNodes))
-	for _, node := range exitNodes {
-		log.Printf("🛰 %s (%s:%s)", node.NodeId, node.Ip, node.Port)
-	}
-
 	log.Println("✅ Super Node registered to Base Node. Starting heartbeat...")
-	go node.StartHeartbeat() //  Also run this in a goroutine
+	go node.StartHeartbeat()
 
-	select {} // 🧠 Block forever to keep both sides alive
+	select {} // Keep process alive
 }

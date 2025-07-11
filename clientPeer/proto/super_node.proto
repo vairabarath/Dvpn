@@ -4,11 +4,13 @@ package dvpn;
 
 import "base_node.proto";
 
-option go_package = "github.com/vairabarath/Dvpn/super/pb";
+option go_package = "Client_peer/pb";
 
 service SuperNodeService {
     rpc RegisterClientPeer (PeerRegistrationRequest) returns (RegisterResponse);
     rpc PeerSessionHeartbeat (PeerSessionHeartbeatRequest) returns (Ack);
+    rpc RequestExitPeer(ExitPeerRequest) returns (ExitPeerResponse);
+    rpc RequestExit (ExitRequest) returns (WireguardConfig); 
 }
 
 message PeerRegistrationRequest {
@@ -31,3 +33,35 @@ message PeerSessionHeartbeatRequest {
     int32 session_uptime_secs = 6;
 }
 
+message ExitPeerRequest {
+    string requester_id = 1;
+    float min_bandwidth_mbps = 2;
+    float max_latency_ms = 3;
+    string requested_region = 4;
+}
+
+message ExitPeerResponse {
+    string public_key = 1;
+    string endpoint_ip = 2;
+    string endpoint_port = 3;
+    string allowed_ips = 4;
+    string peer_id = 5;
+    string region = 6;
+}
+
+message ExitRequest {
+    string peer_id = 1;
+    string requested_region = 2;
+    float min_bandwidth_mbps = 3;
+    float max_latency_ms = 4;
+}
+
+message WireguardConfig {
+    string interface_private_key = 1;
+    string interface_address = 2;
+    string dns = 3;
+    string peer_public_key = 4;
+    string peer_endpoint = 5;
+    string allowed_ips = 6;
+    int32 keepalive = 7;
+}

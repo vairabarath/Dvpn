@@ -41,7 +41,7 @@ func (s *SuperNode) Register() error {
 	nonce := super.GenerateNonce()
 	ip := utils.GetLocalIP()
 	fmt.Println(nonce)
-	sign := super.SignPayload(priv, s.id, "IN", ip, nonce)
+	sign := super.SignPayload(priv, s.id, s.region, ip, nonce)
 
 	req := &pb.RegisterRequest{
 		NodeId:      s.id,
@@ -114,4 +114,27 @@ func (s *SuperNode) RequestExitCandidates(region string, minBandwidth float32, m
 	}
 
 	return res.Nodes, nil
+}
+
+// super to super
+func RequestExitPeerFromRemote(ip, port string, req *pb.ExitPeerRequest) (*pb.ExitPeerResponse, error) {
+	addr := fmt.Sprintf("%s:%s", ip, port)
+
+	conn, err := grpc.Dial(addr, grpc.WithInsecure())
+	if err != nil {
+		return nil, fmt.Errorf("failed to dial remote super node: %w", err)
+	}
+	defer conn.Close()
+
+	client := pb.NewSuperNodeServiceClient(conn)
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+
+	res, err := client.RequestExitPeer(ctx, req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to request exit peer: %w", err)
+	}
+
+	return res, nil
 }

@@ -17,6 +17,8 @@ type ClientPeerInfo struct {
 	Os             string
 	Region         string
 	NatType        string
+	Ip             string
+	GrpcPort       string
 	RegisteredAt   string
 	LastHeartbeat  time.Time
 	SessionUptime  int32
@@ -50,23 +52,6 @@ func NewSupreNodeServer(baseClient pb.BaseNodeServiceClient, region string) *Sup
 		exitPeers:       make(map[string]*ExitPeerInfo),
 		baseClient:      baseClient,
 	}
-
-	if region == "US" {
-		log.Println("🌎 Registering mock exit peer for US Super Node")
-
-		s.exitPeers["exit-us-001"] = &ExitPeerInfo{
-			PeerId:        "exit-us-001",
-			PublicKey:     "wgpubkey123",
-			EndpointIp:    "192.168.1.100",
-			EndpointPort:  "51820",
-			AllowedIps:    "0.0.0.0/0",
-			Region:        "US",
-			BandwidthMbps: 100.0,
-			LatencyMs:     20.0,
-			LastSeen:      time.Now(),
-		}
-	}
-
 	return s
 }
 
@@ -94,6 +79,8 @@ func (s *SuperNodeServer) RegisterClientPeer(ctx context.Context, req *pb.PeerRe
 		Os:            req.Os,
 		Region:        req.Region,
 		NatType:       req.NatType,
+		Ip:            req.Ip,
+		GrpcPort:      req.GrpcPort,
 		RegisteredAt:  time.Now().Format(time.RFC3339),
 		LastHeartbeat: time.Now(),
 	}
@@ -135,29 +122,63 @@ func (s *SuperNodeServer) StartPeerMonitoring() {
 	}()
 }
 
-// super to super
+// super to super for exit peer
 func (s *SuperNodeServer) RequestExitPeer(ctx context.Context, req *pb.ExitPeerRequest) (*pb.ExitPeerResponse, error) {
-	log.Printf("🚪 Request from %s for exit peer in %s", req.RequesterId, req.RequestedRegion)
+	log.Printf("📞 Dynamically searching for exit peer in region: %s", req.RequestedRegion)
 
-	for _, peer := range s.exitPeers {
+	var chosen *ClientPeerInfo
+	for _, peer := range s.registeredPeers {
 		if peer.Region == req.RequestedRegion &&
-			peer.BandwidthMbps >= req.MinBandwidthMbps &&
-			peer.LatencyMs <= req.MaxLatencyMs {
+			peer.ThroughputMbps >= req.MinBandwidthMbps &&
+			float32(peer.LatencyMs) <= req.MaxLatencyMs {
 
-			log.Printf("✅ Exit peer selected: %s", peer.PeerId)
-			return &pb.ExitPeerResponse{
-				PublicKey:    peer.PublicKey,
-				EndpointIp:   peer.EndpointIp,
-				EndpointPort: peer.EndpointPort,
-				AllowedIps:   peer.AllowedIps,
-				PeerId:       peer.PeerId,
-				Region:       peer.Region,
-			}, nil
+			log.Printf("✅ Candidate: %s | IP: %s:%s | Latency: %dms | BW: %.2f Mbps",
+				peer.PeerID, peer.Ip, peer.GrpcPort, peer.LatencyMs, peer.ThroughputMbps)
+
+			chosen = peer
+			break // for now, pick the first match — later apply ranking logic
 		}
 	}
 
-	log.Println("❌ No matching exit peer found")
-	return nil, fmt.Errorf("no suitable exit peer found")
+	if chosen == nil {
+		log.Printf("❌ No suitable exit peer found in registered peers")
+		return nil, fmt.Errorf("no suitable exit peer found in registered peers")
+	}
+
+	exitPeerAddr := fmt.Sprintf("%s:%s", chosen.Ip, chosen.GrpcPort)
+	log.Printf("🔁 Connecting to exit peer %s at %s", chosen.PeerID, exitPeerAddr)
+
+	conn, err := grpc.Dial(exitPeerAddr, grpc.WithInsecure())
+	if err != nil {
+		log.Printf("❌ Failed to connect to Exit Peer at %s: %v", exitPeerAddr, err)
+		return nil, err
+	}
+	defer conn.Close()
+
+	exitClient := pb.NewExitPeerServiceClient(conn)
+
+	infoRes, err := exitClient.GetWireGuardInfo(ctx, &pb.ExitPeerInfoRequest{
+		RequesterId:      req.RequesterId,
+		Region:           req.RequestedRegion,
+		MinBandwidthMbps: req.MinBandwidthMbps,
+		MaxLatencyMs:     req.MaxLatencyMs,
+	})
+	if err != nil {
+		log.Printf("❌ Failed to fetch WireGuard info from Exit Peer %s: %v", chosen.PeerID, err)
+		return nil, err
+	}
+
+	log.Printf("✅ WireGuard info received from exit peer %s: %s:%s",
+		chosen.PeerID, infoRes.EndpointIp, infoRes.EndpointPort)
+
+	return &pb.ExitPeerResponse{
+		PublicKey:    infoRes.PublicKey,
+		EndpointIp:   infoRes.EndpointIp,
+		EndpointPort: infoRes.EndpointPort,
+		AllowedIps:   infoRes.AllowedIps,
+		PeerId:       chosen.PeerID,
+		Region:       req.RequestedRegion,
+	}, nil
 }
 
 // client and super

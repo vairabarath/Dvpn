@@ -4,7 +4,7 @@ package dvpn;
 
 import "google/protobuf/empty.proto";
 
-option go_package = "Super_node/pb";
+option go_package = "./pb";
 
 service BaseNodeService {
     rpc RegisterSuperNode (RegisterRequest) returns (RegisterResponse);

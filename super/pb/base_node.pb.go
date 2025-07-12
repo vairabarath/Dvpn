@@ -617,7 +617,7 @@ const file_base_node_proto_rawDesc = "" +
 	"\x11RegisterSuperNode\x12\x15.dvpn.RegisterRequest\x1a\x16.dvpn.RegisterResponse\x127\n" +
 	"\x12SuperNodeHeartbeat\x12\x16.dvpn.HeartbeatRequest\x1a\t.dvpn.Ack\x12B\n" +
 	"\x13GetActiveSuperNodes\x12\x16.google.protobuf.Empty\x1a\x13.dvpn.SuperNodeList\x12A\n" +
-	"\x11RequestExitRegion\x12\x17.dvpn.ExitRegionRequest\x1a\x13.dvpn.SuperNodeListB\x05Z\x03/pbb\x06proto3"
+	"\x11RequestExitRegion\x12\x17.dvpn.ExitRegionRequest\x1a\x13.dvpn.SuperNodeListB\x06Z\x04./pbb\x06proto3"
 
 var (
 	file_base_node_proto_rawDescOnce sync.Once

@@ -4,7 +4,7 @@ package dvpn;
 
 import "base_node.proto";
 
-option go_package = "Super_node/pb";
+option go_package = "./pb";
 
 service SuperNodeService {
     rpc RegisterClientPeer (PeerRegistrationRequest) returns (RegisterResponse);
@@ -22,6 +22,8 @@ message PeerRegistrationRequest {
     string nat_type = 6;
     string signature = 7;
     string nonce = 8;
+    string ip = 9;
+    string grpc_port = 10;
 }
 
 message PeerSessionHeartbeatRequest {

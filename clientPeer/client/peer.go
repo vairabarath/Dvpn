@@ -15,12 +15,14 @@ import (
 type ClientPeer struct {
 	client pb.SuperNodeServiceClient
 	id     string
+	region string
 }
 
-func NewClientPeer(conn *grpc.ClientConn, id string) *ClientPeer {
+func NewClientPeer(conn *grpc.ClientConn, id string, region string) *ClientPeer {
 	return &ClientPeer{
 		client: pb.NewSuperNodeServiceClient(conn),
 		id:     id,
+		region: region,
 	}
 }
 
@@ -30,14 +32,14 @@ func (cp *ClientPeer) Register() error {
 
 	priv, pub, _ := crypto.LoadOrCreateKeypair()
 	nonce := crypto.GenerateNonce()
-	signature := crypto.SignPeerPayload(priv, cp.id, "IN", "Linux", "symmetric", nonce)
+	signature := crypto.SignPeerPayload(priv, cp.id, cp.region, "Linux", "symmetric", nonce)
 
 	req := &pb.PeerRegistrationRequest{
 		PeerId:    cp.id,
 		PublicKey: base64.StdEncoding.EncodeToString(pub),
 		Version:   "0.1",
 		Os:        "Linux",
-		Region:    "IN",
+		Region:    cp.region,
 		NatType:   "symmetric",
 		Signature: signature,
 		Nonce:     nonce,

@@ -146,7 +146,7 @@ func (s *BaseNodeServer) GetActiveSuperNodes(ctx context.Context, _ *emptypb.Emp
 func (b *BaseNodeServer) GetFilteredSuperNodes(count int32, minBW float32, maxLatency float32) []*SuperNodeInfo {
 	var filtered []*SuperNodeInfo
 	for _, sn := range b.registeredSuperNodes {
-		if sn.BandwidthMbps >= minBW && sn.AvgLatency <= maxLatency {
+		if sn.BandwidthMbps >= 0 && sn.AvgLatency <= 1000 {
 			filtered = append(filtered, sn)
 		}
 	}

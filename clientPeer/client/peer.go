@@ -83,13 +83,15 @@ func (cp *ClientPeer) StartHeartbeat() {
 	}
 }
 
-func (cp *ClientPeer) RequestExit(region string) error {
+func (cp *ClientPeer) RequestExit(region string, minBW float32, maxLatency float32) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 
 	req := &pb.ExitRequest{
-		PeerId:          cp.id,
-		RequestedRegion: region,
+		PeerId:           cp.id,
+		RequestedRegion:  region,
+		MinBandwidthMbps: minBW,
+		MaxLatencyMs:     maxLatency,
 	}
 
 	res, err := cp.client.RequestExit(ctx, req)

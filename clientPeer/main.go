@@ -59,13 +59,13 @@ func main() {
 		log.Fatalf("❌ Failed to register peer: %v", err)
 	}
 
-	log.Println("✅ Peer registered. Requesting WireGuard config...")
-	if err := peer.RequestExit("US"); err != nil {
-		log.Fatalf("❌ Exit request failed: %v", err)
-	}
-
 	log.Println("✅ Peer registered. Starting heartbeat...")
-	peer.StartHeartbeat()
+	go peer.StartHeartbeat()
+
+	log.Println("Requesting exit...")
+	if err := peer.RequestExit("US", 10.0, 100.0); err != nil {
+		log.Fatalf("❌ Failed to request exit: %v", err)
+	}
 
 	select {}
 }

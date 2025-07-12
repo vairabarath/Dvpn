@@ -70,7 +70,7 @@ func main() {
 		grpcServer := grpc.NewServer()
 
 		// ⬇️ Pass baseClient into server handler
-		superNodeServer := server.NewSupreNodeServer(baseClient)
+		superNodeServer := server.NewSupreNodeServer(baseClient, *region)
 		superNodeServer.StartPeerMonitoring()
 
 		pb.RegisterSuperNodeServiceServer(grpcServer, superNodeServer)
@@ -90,5 +90,5 @@ func main() {
 	log.Println("✅ Super Node registered to Base Node. Starting heartbeat...")
 	go node.StartHeartbeat()
 
-	select {} // Keep process alive
+	select {}
 }

@@ -44,23 +44,27 @@ type SuperNodeServer struct {
 	baseClient      pb.BaseNodeServiceClient
 }
 
-func NewSupreNodeServer(baseClient pb.BaseNodeServiceClient) *SuperNodeServer {
+func NewSupreNodeServer(baseClient pb.BaseNodeServiceClient, region string) *SuperNodeServer {
 	s := &SuperNodeServer{
 		registeredPeers: make(map[string]*ClientPeerInfo),
 		exitPeers:       make(map[string]*ExitPeerInfo),
 		baseClient:      baseClient,
 	}
 
-	s.exitPeers["exit-us-001"] = &ExitPeerInfo{
-		PeerId:        "exit-us-001",
-		PublicKey:     "wgpubkey123",
-		EndpointIp:    "192.168.1.100",
-		EndpointPort:  "51820",
-		AllowedIps:    "0.0.0.0/0",
-		Region:        "US",
-		BandwidthMbps: 100.0,
-		LatencyMs:     20.0,
-		LastSeen:      time.Now(),
+	if region == "US" {
+		log.Println("🌎 Registering mock exit peer for US Super Node")
+
+		s.exitPeers["exit-us-001"] = &ExitPeerInfo{
+			PeerId:        "exit-us-001",
+			PublicKey:     "wgpubkey123",
+			EndpointIp:    "192.168.1.100",
+			EndpointPort:  "51820",
+			AllowedIps:    "0.0.0.0/0",
+			Region:        "US",
+			BandwidthMbps: 100.0,
+			LatencyMs:     20.0,
+			LastSeen:      time.Now(),
+		}
 	}
 
 	return s
@@ -167,7 +171,7 @@ func (s *SuperNodeServer) RequestExit(ctx context.Context, req *pb.ExitRequest) 
 		Count:            1,
 	}
 
-	superList, err := s.baseClient.RequestExitRegion(ctx, exitReq)
+	superList, err := s.baseClient.RequestExitRegion(ctx, exitReq) //requesting to the local basenode for remote supernodes
 	if err != nil {
 		log.Printf("❌ Failed to request remote SuperNodes: %v", err)
 		return nil, err
@@ -186,6 +190,7 @@ func (s *SuperNodeServer) RequestExit(ctx context.Context, req *pb.ExitRequest) 
 		log.Printf("❌ Failed to connect to remote SuperNode: %v", err)
 		return nil, err
 	}
+	println("Connected to remote SuperNode")
 	defer conn.Close()
 
 	client := pb.NewSuperNodeServiceClient(conn)

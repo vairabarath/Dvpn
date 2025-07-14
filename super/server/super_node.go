@@ -99,6 +99,21 @@ func (s *SuperNodeServer) PeerSessionHeartbeat(ctx context.Context, req *pb.Peer
 	log.Printf("💓 Heartbeat from %s (exit: %s) — latency: %dms, loss: %.1f%%, throughput: %.2f Mbps, uptime: %ds",
 		req.PeerId, req.ExitPeerId, req.LatencyMs, req.PacketLoss, req.ThroughputMbps, req.SessionUptimeSecs)
 
+	peer, ok := s.registeredPeers[req.PeerId]
+	if !ok {
+		log.Printf("Heartbeat from unknown peer: %s", req.PeerId)
+		return &pb.Ack{
+			Received: false,
+			Message:  "Peer not found",
+		}, nil
+	}
+
+	peer.LatencyMs = req.LatencyMs
+	peer.PacketLoss = req.PacketLoss
+	peer.ThroughputMbps = req.ThroughputMbps
+	peer.SessionUptime = req.SessionUptimeSecs
+	peer.LastHeartbeat = time.Now()
+
 	return &pb.Ack{
 		Received: true,
 		Message:  "Heartbeat received",
@@ -202,7 +217,7 @@ func (s *SuperNodeServer) RequestExit(ctx context.Context, req *pb.ExitRequest) 
 		return nil, fmt.Errorf("no SuperNodes available for region %s", req.RequestedRegion)
 	}
 
-	chosen := superList.Nodes[0]
+	chosen := superList.Nodes[0] // TODO: implement load balancing logic for fairer distribution
 	log.Printf("🛰 Chosen remote super: %s (%s:%s)", chosen.NodeId, chosen.Ip, chosen.Port)
 
 	addr := fmt.Sprintf("%s:%s", chosen.Ip, chosen.Port)
@@ -214,9 +229,9 @@ func (s *SuperNodeServer) RequestExit(ctx context.Context, req *pb.ExitRequest) 
 	println("Connected to remote SuperNode")
 	defer conn.Close()
 
-	client := pb.NewSuperNodeServiceClient(conn)
+	RemoteSuperNode := pb.NewSuperNodeServiceClient(conn)
 
-	exitRes, err := client.RequestExitPeer(ctx, &pb.ExitPeerRequest{
+	exitRes, err := RemoteSuperNode.RequestExitPeer(ctx, &pb.ExitPeerRequest{
 		RequesterId:      req.PeerId,
 		MinBandwidthMbps: req.MinBandwidthMbps,
 		MaxLatencyMs:     req.MaxLatencyMs,
@@ -229,7 +244,7 @@ func (s *SuperNodeServer) RequestExit(ctx context.Context, req *pb.ExitRequest) 
 	}
 
 	config := &pb.WireguardConfig{
-		InterfacePrivateKey: "", // TODO
+		InterfacePrivateKey: "", // TODO: generate private key
 		InterfaceAddress:    "10.0.0.2/32",
 		Dns:                 "1.1.1.1",
 		PeerPublicKey:       exitRes.PublicKey,

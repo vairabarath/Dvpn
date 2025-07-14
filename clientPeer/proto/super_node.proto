@@ -22,6 +22,8 @@ message PeerRegistrationRequest {
     string nat_type = 6;
     string signature = 7;
     string nonce = 8;
+    string ip = 9;
+    string grpc_port = 10;
 }
 
 message PeerSessionHeartbeatRequest {

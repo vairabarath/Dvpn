@@ -29,6 +29,7 @@ func main() {
 	baseIP := flag.String("base-ip", "127.0.0.1", "IP address of the Base Node")
 	region := flag.String("region", "IN", "Region code for Super Node")
 	exitPeerPort := flag.String("exit-port", "6000", "Port to run Exit Peer gRPC Server")
+	reqRegion := flag.String("req-region", "", "Region code to request exit (optional)")
 	flag.Parse()
 
 	ip := utils.GetLocalIP()
@@ -103,9 +104,13 @@ func main() {
 	log.Println("✅ Peer registered. Starting heartbeat...")
 	go peer.StartHeartbeat()
 
-	log.Println("📨 Requesting exit...")
-	if err := peer.RequestExit("US", 10.0, 100.0); err != nil {
-		log.Fatalf("❌ Failed to request exit: %v", err)
+	if *reqRegion != "" {
+		log.Printf("📨 Requesting exit to region %s...", *reqRegion)
+		if err := peer.RequestExitEndpoint(*reqRegion, 10.0, 100.0); err != nil {
+			log.Fatalf("❌ Failed to request exit: %v", err)
+		}
+	} else {
+		log.Println("ℹ️ No --req-region specified, skipping exit peer request.")
 	}
 
 	select {} // block forever

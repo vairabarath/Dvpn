@@ -3,6 +3,7 @@ package client
 import (
 	"Client_peer/crypto"
 	"Client_peer/pb"
+	"Client_peer/utils"
 	"context"
 	"encoding/base64"
 	"fmt"
@@ -43,6 +44,8 @@ func (cp *ClientPeer) Register() error {
 		NatType:   "symmetric",
 		Signature: signature,
 		Nonce:     nonce,
+		Ip:        utils.GetLocalIP(),
+		GrpcPort:  "6000",
 	}
 
 	res, err := cp.client.RegisterClientPeer(ctx, req)
@@ -85,7 +88,7 @@ func (cp *ClientPeer) StartHeartbeat() {
 	}
 }
 
-func (cp *ClientPeer) RequestExit(region string, minBW float32, maxLatency float32) error {
+func (cp *ClientPeer) RequestExitEndpoint(region string, minBW float32, maxLatency float32) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 

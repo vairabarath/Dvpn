@@ -1,0 +1,87 @@
+syntax = "proto3";
+
+package dvpn;
+
+import "google/protobuf/empty.proto";
+
+option go_package = "/pb";
+
+service BaseNodeService {
+    rpc RegisterSuperNode (RegisterRequest) returns (RegisterResponse);
+    rpc SuperNodeHeartbeat (HeartbeatRequest) returns (Ack);
+    rpc GetActiveSuperNodes (google.protobuf.Empty) returns (SuperNodeList);
+    rpc RequestExitRegion (ExitRegionRequest) returns (SuperNodeList);
+    rpc DiscoverClientRegion (DiscoverRequest) returns (DiscoveryResponse);
+}
+
+message RegisterRequest {
+    string node_id = 1;           
+    string region = 2;            
+    string ip = 3;               
+    string public_key = 4;        
+    string signature = 5;         
+    string nonce = 6;            
+    int32 max_peers = 7;          
+    string version = 8;           
+    string startup_time = 9;      
+    string port = 10;
+}
+
+message RegisterResponse {
+    bool success = 1;
+    string message = 2;
+    string assigned_id = 3;
+    string registered_at = 4;
+}
+
+message HeartbeatRequest {
+    string node_id = 1;
+    int32 active_peers = 2;
+    int32 exit_peers_available = 3;
+    float avg_latency_ms = 4;
+    float bandwidth_usage_mbps = 5;
+    string timestamp = 6;
+}
+
+message Ack {
+    bool received = 1;
+    string message = 2;
+}
+
+message SuperNode {
+    string node_id = 1;
+    string region = 2;
+    string ip = 3;
+    string version = 4;
+    string latest_heartbeat = 5;
+    bool is_alive = 6;
+    string port = 7;
+    float avg_latency_ms = 8;
+    float bandwidth_mbps = 9;
+}
+
+message SuperNodeList {
+    repeated SuperNode nodes = 1;
+}
+
+message ExitRegionRequest {
+    string desired_region = 1;
+    float min_bandwidth_mbps = 2;
+    float max_latency_ms = 3;
+    int32 count = 4;
+}
+
+message DiscoverRequest {
+    string peer_id = 1;
+    string public_key = 2;
+    string os = 3;
+    string version = 4;
+    string nat_type = 5;
+}
+
+message DiscoveryResponse {
+    bool accepted = 1;
+    string region = 2;
+    string message = 3;
+    repeated SuperNode nodes = 4;
+}

@@ -1,0 +1,72 @@
+syntax = "proto3";
+
+package dvpn;
+
+import "base_node.proto";
+
+option go_package = "Client_peer/pb";
+
+service SuperNodeService {
+    rpc RegisterClientPeer (PeerRegistrationRequest) returns (RegisterResponse);
+    rpc PeerSessionHeartbeat (PeerSessionHeartbeatRequest) returns (Ack);
+    rpc RequestExitPeer(ExitPeerRequest) returns (ExitPeerResponse);
+    rpc RequestExit (ExitRequest) returns (WireguardConfig);
+}
+
+message PeerRegistrationRequest {
+    string peer_id = 1;
+    string public_key = 2;
+    string version = 3;
+    string os = 4;
+    string region = 5;
+    string nat_type = 6;
+    string signature = 7;
+    string nonce = 8;
+    string ip = 9;
+    string grpc_port = 10;
+}
+
+message PeerSessionHeartbeatRequest {
+    string peer_id = 1;
+    string exit_peer_id = 2;
+    int32 latency_ms = 3;
+    float packet_loss = 4;
+    float throughput_mbps = 5;
+    int32 session_uptime_secs = 6;
+}
+
+message ExitPeerRequest {
+    string requester_id = 1;
+    float min_bandwidth_mbps = 2;
+    float max_latency_ms = 3;
+    string requested_region = 4;
+    string client_public_key = 5;
+}
+
+message ExitPeerResponse {
+    string public_key = 1;
+    string endpoint_ip = 2;
+    string endpoint_port = 3;
+    string allowed_ips = 4;
+    string peer_id = 5;
+    string region = 6;
+    string client_ip = 7;
+}
+
+message ExitRequest {
+    string peer_id = 1;
+    string client_public_key = 2;
+    string requested_region = 3;
+    float min_bandwidth_mbps = 4;
+    float max_latency_ms = 5;
+}
+
+message WireguardConfig {
+    string interface_private_key = 1;
+    string interface_address = 2;
+    string dns = 3;
+    string peer_public_key = 4;
+    string peer_endpoint = 5;
+    string allowed_ips = 6;
+    int32 keepalive = 7;
+}

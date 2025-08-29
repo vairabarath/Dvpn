@@ -1,0 +1,25 @@
+syntax = "proto3";
+package dvpn;
+option go_package = "Client_peer/pb";
+
+service ExitPeerService {
+  rpc GetWireGuardInfo(ExitPeerInfoRequest) returns (ExitPeerInfoResponse);
+}
+
+message ExitPeerInfoRequest {
+  string requester_id = 1;
+  string client_public_key = 2;
+  float min_bandwidth_mbps = 3;
+  float max_latency_ms = 4;
+  string region = 5;
+}
+
+message ExitPeerInfoResponse {
+  string public_key = 1;
+  string endpoint_ip = 2;
+  string endpoint_port = 3;
+  string allowed_ips = 4;
+  float bandwidth_mbps = 5;
+  float latency_ms = 6;
+  string client_ip = 7;
+}
